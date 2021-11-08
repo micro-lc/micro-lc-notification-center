@@ -1,0 +1,12 @@
+{
+  "name": "micro-lc-notification-center",
+  "version": "0.1.0",
+  "description": "micro-lc plugin to handle notifications",
+  "private": true,
+  "workspaces": [],
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {},
+  "repository": "git@github.com:micro-lc/micro-lc-notification-center.git",
+  "license": "SEE LICENSE IN LICENSE"
+}
