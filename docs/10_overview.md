@@ -13,7 +13,8 @@ the endpoints called by the component that should be exposed by the service.
 
 #### GET - `/own`
 
-This endpoint should return the list of paged notifications that the currently logged-in user should visualize.
+This endpoint should return the list of paged notifications that the currently logged-in user should visualize. The notifications
+should be ordered by creation date descending.
 
 **Query**
 
@@ -49,6 +50,9 @@ This endpoint should return the list of paged notifications that the currently l
       "read": {
         "type": "boolean"
       },
+      "createdAt": {
+        "type": "string"
+      },
       "onClickCallback": {
         "kind": {
           "type": "string",
@@ -62,7 +66,8 @@ This endpoint should return the list of paged notifications that the currently l
       }
     },
     "required": [
-      "title"
+      "title",
+      "createdAt"
     ]
   }
 }
