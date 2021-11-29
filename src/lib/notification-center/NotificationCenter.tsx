@@ -1,5 +1,7 @@
 import React, {ReactElement, useEffect, Fragment} from 'react'
 
+import {Button} from 'antd'
+
 export type Notification = {
   _id: string
   creatorId: string
@@ -22,7 +24,7 @@ export default function NotificationCenter (props: NotificationCenterProps): Rea
   return (
     <Fragment>
       {props.loading ? 'loading' : 'Notification Center'}
-      <button onClick={props.next}>{'next'}</button>  
+      <Button className='nextButton' style={{marginLeft: 8}} type='primary'>{'Next'}</Button>
       <button onClick={props.reload}>{'reload'}</button>
     </Fragment>
   )

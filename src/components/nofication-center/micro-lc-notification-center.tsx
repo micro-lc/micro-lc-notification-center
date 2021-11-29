@@ -9,7 +9,8 @@ import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
 
 @Component({
   tag: 'micro-lc-notification-center',
-  shadow: true
+  styleUrl: '../../../node_modules/antd/dist/antd.css',
+  shadow: false
 })
 export class MicroLcNotificationCenter {
   @Element() element: HTMLElement
