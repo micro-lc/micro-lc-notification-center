@@ -1,9 +1,9 @@
-import React, {ReactElement, Fragment} from 'react';
+import React, {ReactElement, Fragment} from 'react'
 
-import {Button} from 'antd';
+import {Button} from 'antd'
 
-import {Notification} from '.';
-import {NotificationEntry} from '.';
+import {Notification} from './NotificationCenter'
+import NotificationEntry from './NotificationEntry'
 
 export type NotificationsListProps = {
     notifications: Notification[]

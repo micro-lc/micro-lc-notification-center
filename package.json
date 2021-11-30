@@ -27,8 +27,9 @@
     "build": "stencil build --docs",
     "start": "stencil build --dev --watch --serve",
     "start:be": "mock-server --port 8000 --root __be__ --watch",
-    "test": "NODE_ENV=test stencil test --spec --passWithNoTests",
+    "test:stencil": "NODE_ENV=test stencil test --spec --passWithNoTests",
     "test:react": "jest --config src/lib/jest.config.json --passWithNoTests",
+    "test": "yarn test:react && yarn test:stencil",
     "coverage": "yarn test --coverage",
     "coverage:react": "yarn test:react --coverage"
   },
