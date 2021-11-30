@@ -1,5 +1,8 @@
 {
   "setupFilesAfterEnv": ["<rootDir>/test-setup.ts"],
+  "moduleNameMapper":{
+    "\\.css$": "<rootDir>/__mocks__/styleMock.js"
+  },
   "coverageThreshold": {
     "global": {
       "statements": 80,

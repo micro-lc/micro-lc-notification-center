@@ -13,6 +13,7 @@
 /www
 /dist
 /build
+/loader
 
 # misc
 .DS_Store

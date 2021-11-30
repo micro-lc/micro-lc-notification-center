@@ -1,4 +1,4 @@
-.nextButton {
-  background-color: var(--primary-color) !important;
+.next-button {
+  min-width: 300px;
   padding: 0 !important;
 }

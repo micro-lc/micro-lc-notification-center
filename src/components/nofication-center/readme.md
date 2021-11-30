@@ -7,9 +7,11 @@
 
 ## Properties
 
-| Property  | Attribute | Description | Type                       | Default     |
-| --------- | --------- | ----------- | -------------------------- | ----------- |
-| `headers` | --        |             | `{ [x: string]: string; }` | `undefined` |
+| Property   | Attribute  | Description | Type                       | Default                    |
+| ---------- | ---------- | ----------- | -------------------------- | -------------------------- |
+| `endpoint` | `endpoint` |             | `string`                   | `undefined`                |
+| `headers`  | --         |             | `{ [x: string]: string; }` | `{}`                       |
+| `limit`    | `limit`    |             | `number`                   | `DEFAULT_PAGINATION_LIMIT` |
 
 
 ----------------------------------------------
