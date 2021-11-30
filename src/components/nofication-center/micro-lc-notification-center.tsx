@@ -4,6 +4,7 @@ import {h, Component, Host, Element, Prop, State} from '@stencil/core'
 import ReactDOM from 'react-dom'
 
 import {NotificationCenter, Notification, NotificationCenterProps} from '../../lib'
+import {PartialTranslations} from '../../lib/utils/i18n.utils'
 import {DEFAULT_PAGINATION_LIMIT, getNotifications} from '../../utils/notificationsClient'
 import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
 
@@ -16,6 +17,7 @@ export class MicroLcNotificationCenter {
 
   @Prop() endpoint: string
   @Prop() headers: MicroLcHeaders = {}
+  @Prop() locales: PartialTranslations = {}
   @Prop() limit = DEFAULT_PAGINATION_LIMIT
   
   @State() notifications: Notification[] = []
@@ -34,7 +36,8 @@ export class MicroLcNotificationCenter {
         loading: this.loading, 
         notifications: this.notifications,
         next: () => this.loadNotifications(this.page.skip, false),
-        reload: () => this.loadNotifications(0, true)
+        reload: () => this.loadNotifications(0, true),
+        locales: this.locales
       }
     )
   }

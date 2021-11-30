@@ -6,11 +6,13 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { MicroLcHeaders } from "./components/nofication-center/micro-lc-notification-center.types";
+import { PartialTranslations } from "./lib/utils/i18n.utils";
 export namespace Components {
     interface MicroLcNotificationCenter {
         "endpoint": string;
         "headers": MicroLcHeaders;
         "limit": number;
+        "locales": PartialTranslations;
     }
 }
 declare global {
@@ -29,6 +31,7 @@ declare namespace LocalJSX {
         "endpoint"?: string;
         "headers"?: MicroLcHeaders;
         "limit"?: number;
+        "locales"?: PartialTranslations;
     }
     interface IntrinsicElements {
         "micro-lc-notification-center": MicroLcNotificationCenter;

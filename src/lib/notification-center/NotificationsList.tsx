@@ -6,7 +6,7 @@ import {Notification} from '.';
 import {NotificationEntry} from '.';
 
 export type NotificationsListProps = {
-    notifications?: Notification[]
+    notifications: Notification[]
     next?: () => void
     loading?: boolean
   }

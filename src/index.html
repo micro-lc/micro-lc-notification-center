@@ -40,11 +40,24 @@
   <body>
     <div class="topnav">
       <button>Home</button>
-      <micro-lc-notification-center></micro-lc-notification-center>
+      <micro-lc-notification-center 
+        endpoint="http://localhost:8000/notifications"
+        limit="5"
+      ></micro-lc-notification-center>
       <script>
         const microLcNotificationCenter = document.querySelector('micro-lc-notification-center')
         microLcNotificationCenter.headers = { 'client-key': 'random-client-key' }
-        microLcNotificationCenter.endpoint = 'http://localhost:8000/notifications'
+        microLcNotificationCenter.locales = {
+          "title": {
+            "it": "Notifiche",
+            "en": "Notifications",
+            "de": "Benachrichtigungen"
+          },
+          "dateFormat": {
+            "it": "DD MMM YYYY",
+            "en": "MMM DD YYYY",
+          }
+        }
       </script>
     </div>
   </body>

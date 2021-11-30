@@ -1,10 +1,11 @@
-import React, {ReactElement, useEffect, Fragment, useMemo} from 'react'
+import React, {ReactElement, useMemo} from 'react'
 
 import {BellOutlined, ReloadOutlined} from '@ant-design/icons'
 import {Button, Popover, Row, Col} from 'antd'
 import antd from 'antd/dist/antd.css'
 
 import {parseCssVariable, setCssVariables} from '../utils/css.utils'
+import {I18n, DefaultTranslations, PartialTranslations, useLocale} from '../utils/i18n.utils'
 import styles from './notification-center.css'
 import NotificationsList from './NotificationsList'
 
@@ -22,27 +23,35 @@ export type NotificationCenterProps = {
   notifications?: Notification[]
   next?: () => void
   reload?: () => void
+  locales?: PartialTranslations
 }
 
+const defaultTranslations: DefaultTranslations = {
+  title: 'Notifications', 
+  loadingButton: 'Load More', 
+  dateFormat: 'YYYY-MM-DD'
+}
 
-export default function NotificationCenter (props: NotificationCenterProps): ReactElement {
+function NotificationCenter ({
+  notifications = [], 
+  loading, 
+  locales, 
+  reload, 
+  next
+}: NotificationCenterProps): ReactElement {
   const microlcPrimaryColor = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue(MICROLC_PRIMARY_COLOR_VAR), [])
-
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log(props.notifications)
-  }, [props.loading, props.notifications?.length])
+  const {t} = useLocale()
 
   const Title = () => (
     <Row>
       <Col span={20}>
-        <h2 className='notification-header'>{'Notifications'}</h2>
+        <h2 className='notification-header'>{t('title')}</h2>
       </Col>
       <Col span={4}>
         <Button 
           icon={<ReloadOutlined />} 
-          loading={props.loading} 
-          onClick={props.reload} 
+          loading={loading} 
+          onClick={reload} 
           shape='circle' 
           style={{marginLeft: '10px'}} 
           type='text' 
@@ -52,19 +61,31 @@ export default function NotificationCenter (props: NotificationCenterProps): Rea
   )
 
   return (
-    <Fragment>
+    <I18n.Provider value={{defaultTranslations, locales}}>
       <style>{setCssVariables(microlcPrimaryColor)}</style>
       <style>{parseCssVariable([styles, antd])}</style>
       <Popover 
-        content={<NotificationsList loading={props.loading} next={props.next} notifications={props.notifications}/>} 
+        content={
+          <NotificationsList 
+            loading={loading} 
+            next={next} 
+            notifications={notifications}
+          />
+        } 
         placement='bottomRight' 
         title={<Title />} 
         trigger='click'
       >
-        <Button shape='circle' style={{color: 'white'}} type='primary'>
+        <Button 
+          shape='circle' 
+          style={{color: 'white'}} 
+          type='primary'
+        >
           <BellOutlined />
         </Button>
       </Popover>
-    </Fragment>
+    </I18n.Provider>
   )
 }
+
+export default NotificationCenter
