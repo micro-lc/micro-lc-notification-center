@@ -22,19 +22,19 @@ async function getNotifications(this: MicroLcNotificationCenter, skip: number): 
   return data
 }
 
-async function patchReadState(this: MicroLcNotificationCenter, id: string, readState = true): Promise<void> {
-  if(!id) {
+async function patchReadState(this: MicroLcNotificationCenter, _id: string, readState = true): Promise<void> {
+  if(!_id) {
     throw new Error('`_id` cannot be undefined or an empty string')
   }
 
-  const route = `${Routes.SetRead}/${id}`
+  const route = `${Routes.SetRead}/${_id}`
   await axios.patch<void, AxiosResponse<void>, ReadStateRequestBody>(`${this.endpoint}${route}`, {readState}, {headers: this.headers})
   return 
 }
 
-async function patchAllReadState(this: MicroLcNotificationCenter, readState = true): Promise<number> {
+async function patchAllReadState(this: MicroLcNotificationCenter): Promise<number> {
   const route = `${Routes.SetRead}${Routes.Fetch}`
-  const {data} = await axios.patch<number, AxiosResponse<number>, ReadStateRequestBody>(`${this.endpoint}${route}`, {readState}, {headers: this.headers})
+  const {data} = await axios.patch<number, AxiosResponse<number>, ReadStateRequestBody>(`${this.endpoint}${route}`, {readState: true}, {headers: this.headers})
   return data
 } 
 

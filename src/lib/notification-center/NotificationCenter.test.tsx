@@ -8,6 +8,7 @@ import NotificationCenter from './NotificationCenter'
 describe('NotificationCenter tests', () => {
   it('should render', async () => {
     const notifications = genNotifications(1)
+    // @ts-ignore
     const {getByRole, getAllByRole} = render(<NotificationCenter notifications={notifications}/>)
     const button = getByRole(/button/i)
     fireEvent.click(button)
@@ -19,6 +20,7 @@ describe('NotificationCenter tests', () => {
   })
 
   it.skip('should render loading', () => {
+    // @ts-ignore
     const {getByText} = render(<NotificationCenter loading={true} />)
     expect(getByText('loading')).toBeInTheDocument()
   })

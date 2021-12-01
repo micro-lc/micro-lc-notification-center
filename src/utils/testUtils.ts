@@ -28,12 +28,31 @@ function randomString(length = 10) {
   return result
 }
 
-const mockNotifications = (quantity: number): Notification[] => Array(quantity).fill(0).map(() => ({
-  _id: genId(),
-  creatorId: genId(),
-  createdAt: randomDate(),
-  title: randomString()
-}))
+const mockNotifications = (quantity: number): Notification[] =>
+  Array(quantity).fill(0).map(() => ({
+    _id: genId(),
+    creatorId: genId(),
+    createdAt: randomDate(),
+    title: randomString()
+  }))
+
+const oldestFirst = (a: string, b: string) => (a < b) ? -1 : ((a > b) ? 1 : 0)
+
+class AllNotifications {
+  notifications: Notification[]
+  constructor(quantity: number, unread: number) {
+    this.notifications = mockNotifications(quantity)
+    this.notifications.sort(({createdAt: a}, {createdAt: b}) => -oldestFirst(a, b))
+    this.notifications.forEach((_, i, arr) => {
+      if(i >= unread) {
+        arr[i].readState = true
+      }
+    })
+  }
+  slice (start?: number, end?: number): Notification[] {
+    return this.notifications.slice(start, end)
+  }
+}
 
 type WaitForOptions = {
   timeout: number
@@ -130,4 +149,4 @@ export default class Sandbox {
 }
 
 
-export {mockNotifications, waitForChanges, Sandbox}
+export {mockNotifications, waitForChanges, Sandbox, AllNotifications}

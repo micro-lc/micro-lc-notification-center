@@ -5,7 +5,7 @@ import nock from 'nock'
 import {JSX} from '../../components'
 import {Notification} from '../../lib'
 import {DEFAULT_PAGINATION_LIMIT} from '../../utils/notificationsClient'
-import Sandbox, {mockNotifications, waitForChanges} from '../../utils/testUtils'
+import Sandbox, {AllNotifications, mockNotifications, waitForChanges} from '../../utils/testUtils'
 import {MicroLcNotificationCenter} from './micro-lc-notification-center'
 
 const DEFAULT_NOCK_ENDPOINT = 'http://localhost'
@@ -13,6 +13,10 @@ const NOTIFICATIONS = '/notifications'
 const NOTIFICATIONS_FETCH = `${NOTIFICATIONS}/own`
 const endpoint = `${DEFAULT_NOCK_ENDPOINT}${NOTIFICATIONS}`
 const mocks = {react: ['createElement'], 'react-dom': ['render', 'unmountComponentAtNode']}
+
+const ALL = 99
+const UNREAD = 7
+const allNotifications = new AllNotifications(ALL, UNREAD)
 
 /**
  * initializes a nock get mock to the first 
@@ -53,12 +57,28 @@ function call<T = any, A extends any[] = any> ({mock: {calls}}: jest.Mock<T, A>,
  * @param props props to attach to `micro-lc-notification-center`
  * @returns a new `spec-page` promise
  */
-function create (props: JSX.MicroLcNotificationCenter = {}): Promise<SpecPage> {
+async function create (props: JSX.MicroLcNotificationCenter = {}): Promise<SpecPage> {
   return newSpecPage({
     components: [MicroLcNotificationCenter],
     template: () => h('micro-lc-notification-center', props)//`<micro-lc-notification-center ${endpoint ?? ''}></micro-lc-notification-center>`
   })
 }
+
+async function initStandard (): Promise<SpecPage> {
+  nock(DEFAULT_NOCK_ENDPOINT)
+    .get(NOTIFICATIONS_FETCH)
+    .query({skip: 0, limit: DEFAULT_PAGINATION_LIMIT})
+    .reply(200, allNotifications.slice(0, DEFAULT_PAGINATION_LIMIT))
+  const page = await create({endpoint})
+
+  // await for first notifications batch
+  await waitForChanges(page, () => {
+    expect(nock.isDone()).toBe(true)
+  })
+
+  return page
+}
+
 
 nock.disableNetConnect()
 
@@ -77,20 +97,53 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     nock.cleanAll()
   })
 
-  it('should avoid fetching notifications on absent endopoint', async () => {
+  it('should fetching no notifications from default endopoint and thus set state done', async () => {
     nock(DEFAULT_NOCK_ENDPOINT)
       .get('/api/v1/micro-lc-notification-center/own')
       .query({skip: 0, limit: DEFAULT_PAGINATION_LIMIT})
       .reply(200, [])
     const {react: {createElement}} = sandboxMocks
     const page = await create()
-    expect(call(createElement, 0)[1]).toMatchObject({loading: true, notifications: []})
+    expect(call(createElement, 0)[1]).toMatchObject({
+      loading: true, 
+      notifications: [], 
+      done: false
+    })
 
     // await for fetching and check the response
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 1)[1]).toMatchObject({loading: false, notifications: []})
+    expect(call(createElement, 1)[1]).toMatchObject({
+      loading: false, 
+      notifications: [], 
+      done: true
+    })
+  })
+
+  it('should fetching less notifications than limit from default endopoint and thus set state done', async () => {
+    const notifications = mockNotifications(1)
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .get('/api/v1/micro-lc-notification-center/own')
+      .query({skip: 0, limit: 2})
+      .reply(200, notifications)
+    const {react: {createElement}} = sandboxMocks
+    const page = await create({limit: 2})
+    expect(call(createElement, 0)[1]).toMatchObject({
+      loading: true, 
+      notifications: [], 
+      done: false
+    })
+
+    // await for fetching and check the response
+    await waitForChanges(page, () => {
+      expect(nock.isDone()).toBe(true)
+    })
+    expect(call(createElement, 1)[1]).toMatchObject({
+      loading: false, 
+      notifications, 
+      done: true
+    })
   })
 
   it('should render, then fetch notifications, after that it should be removed and on remount it should\'n fetch again', async () => {
@@ -232,5 +285,53 @@ describe('micro-lc-notification-center lifecycle tests', () => {
       expect(nock.isDone()).toBe(true)
     })
     expect(call(createElement, 3)[1]).toMatchObject({loading: false, notifications: p1})
+  })
+
+  it('should notify some unread notifications', async () => {
+    const {react: {createElement}} = sandboxMocks
+    await initStandard()
+    const {notifications} = call(createElement)[1]
+    expect(notifications.filter(({readState}) => !readState)).toHaveLength(UNREAD)
+    expect(notifications.filter(({readState}) => readState)).toHaveLength(DEFAULT_PAGINATION_LIMIT - UNREAD)
+  })
+
+  it('should click on unread notification', async () => {
+    const {react: {createElement}} = sandboxMocks
+    const page = await initStandard()
+    const {notifications, onClick} = call(createElement)[1]
+    const [{_id, readState}] = notifications
+
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .patch(`${NOTIFICATIONS}/read-state/${_id}`, {readState: true})
+      .reply(200)
+    onClick(_id, readState)
+    await waitForChanges(page, () => {
+      expect(nock.isDone()).toBe(true)
+    })
+  })
+
+  it('should throw on `_id` empty string', async () => {
+    const {react: {createElement}} = sandboxMocks
+    await initStandard()
+    const {onClick} = call(createElement)[1]
+
+    await onClick('').catch((err: any) => {
+      expect(err.message).toStrictEqual('`_id` cannot be undefined or an empty string')
+    })
+  })
+
+  it('should click on set all read', async () => {
+    const {react: {createElement}} = sandboxMocks
+    const page = await initStandard()
+    const {onClickAll} = call(createElement)[1]
+
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .patch(`${NOTIFICATIONS}/read-state/own`, {readState: true})
+      .reply(200, '10')
+    const number = await onClickAll()
+    await waitForChanges(page, () => {
+      expect(nock.isDone()).toBe(true)
+      expect(number).toStrictEqual(10)
+    })
   })
 })

@@ -3,9 +3,9 @@ import React from 'react'
 import {h, Component, Host, Element, Prop, State} from '@stencil/core'
 import ReactDOM from 'react-dom'
 
-import {NotificationCenter, Notification, NotificationCenterProps, ReadStateHandler} from '../../lib'
+import {NotificationCenter, Notification, NotificationCenterProps} from '../../lib'
 import {PartialTranslations} from '../../lib/utils/i18n.utils'
-import {DEFAULT_PAGINATION_LIMIT, getNotifications} from '../../utils/notificationsClient'
+import {DEFAULT_PAGINATION_LIMIT, getNotifications, patchReadState, patchAllReadState} from '../../utils/notificationsClient'
 import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
 
 const DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT = '/api/v1/micro-lc-notification-center'
@@ -69,34 +69,9 @@ export class MicroLcNotificationCenter {
   @State() error = false
   @State() done = false
 
-  private fetch: (skip: number) => Promise<Notification[]> = getNotifications.bind(this)
-  private handleReadState: ReadStateHandler
-  private handleAllReadState: ReadStateHandler
   private wasDetached = false
 
-  private postRetrieval(skipDone: number): void {
-    this.page = {skip: skipDone + this.limit, last: skipDone}
-  }
-
-  private create(): React.FunctionComponentElement<NotificationCenterProps> {
-    return React.createElement(
-      NotificationCenter, {
-        loading: this.loading, 
-        notifications: this.notifications,
-        next: () => this.loadNotifications(this.page.skip, false),
-        reload: () => this.loadNotifications(0, true),
-        locales: this.locales,
-        error: this.error,
-        done: this.done,
-        onClick: this.handleReadState,
-        onClickAll: this.handleAllReadState
-      }
-    )
-  }
-
-  private renderToDOM(): void {
-    ReactDOM.render(this.create(), this.element)
-  }
+  private fetch: (skip: number) => Promise<Notification[]> = getNotifications.bind(this)
 
   private async loadNotifications(page = 0, reload = true): Promise<void> {
     this.loading = true
@@ -117,6 +92,30 @@ export class MicroLcNotificationCenter {
       .finally(() => {
         this.loading = false
       })
+  }
+
+  private postRetrieval(skipDone: number): void {
+    this.page = {skip: skipDone + this.limit, last: skipDone}
+  }
+
+  private create(): React.FunctionComponentElement<NotificationCenterProps> {
+    return React.createElement(
+      NotificationCenter, {
+        loading: this.loading, 
+        notifications: this.notifications,
+        next: () => this.loadNotifications(this.page.skip, false),
+        reload: () => this.loadNotifications(0, true),
+        locales: this.locales,
+        error: this.error,
+        done: this.done,
+        onClick: (_id: string, readState?: boolean) => patchReadState.bind(this)(_id, !readState),
+        onClickAll: patchAllReadState.bind(this)
+      }
+    )
+  }
+
+  private renderToDOM(): void {
+    ReactDOM.render(this.create(), this.element)
   }
 
   connectedCallback() {

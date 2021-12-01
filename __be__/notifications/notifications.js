@@ -24,27 +24,43 @@ function randomString(length = 10) {
   return result
 }
 
-const notifications = Array(148).fill(0).map(() => ({
+const mockNotifications = (quantity) => Array(quantity).fill(0).map(() => ({
   _id: genId(),
   creatorId: genId(),
   createdAt: randomDate(),
   title: randomString()
 }))
 
-module.exports = (request, response) => {
-  const {query} = request
-  if(query && query.skip && query.limit) {
-    const skip = Number.parseInt(query.skip)
-    const limit = Number.parseInt(query.limit)
-    if(Number.isNaN(skip) || (!Number.isNaN(skip) && skip < 0) || skip.toString() !== query.skip) {
-      response.status(404).send({status: 404, error: 'Bad request', message: '`skip` must be a non-negative integer number'})
-    } else if(Number.isNaN(limit) || (!Number.isNaN(limit) && limit < 0) || limit.toString() !== query.limit) {
-      response.status(404).send({status: 404, error: 'Bad request', message: '`limit` must be a non-negative integer number'})
-    } else {
-      response.status(200).send(notifications.slice(skip, skip+limit))
-    }
-    return
+const oldestFirst = (a, b) => (a < b) ? -1 : ((a > b) ? 1 : 0)
+
+class AllNotifications {
+  notifications
+  constructor(quantity, unread) {
+    this.notifications = mockNotifications(quantity)
+    this.notifications.sort(({createdAt: a}, {createdAt: b}) => -oldestFirst(a, b))
+    this.notifications.forEach((_, i, arr) => {
+      if(i >= unread) {
+        arr[i].readState = true
+      }
+    })
   }
-  
-  response.status(404).send({status: 404, error: 'Bad request', message: 'Missing pagination skip and/or limit params'})
+  slice (start, end) {
+    return this.notifications.slice(start, end)
+  }
+  patch (_id, readState) {
+    this.notifications.forEach((el, i, arr) => {
+      if(el._id === _id) {
+        arr[i].readState = readState
+      }
+    })
+  }
+  patchAll (readState) {
+    this.notifications.forEach((el, i, arr) => {
+      arr[i].readState = readState
+    })
+  }
 }
+
+const notifications = new AllNotifications(148, 7)
+
+module.exports = {notifications}
