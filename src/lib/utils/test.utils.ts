@@ -11,7 +11,7 @@ function genId () {
 }
 
 function randomDate(start = startFrom, end = today) {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
 }
 
 function randomString(length = 10) {
