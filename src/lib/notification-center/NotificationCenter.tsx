@@ -26,6 +26,8 @@ export type NotificationCenterProps = {
   reload?: () => void
   locales?: PartialTranslations
   error?: boolean
+  done?: boolean
+  onClick?: (_id: string) => void
 }
 
 const defaultTranslations: DefaultTranslations = {

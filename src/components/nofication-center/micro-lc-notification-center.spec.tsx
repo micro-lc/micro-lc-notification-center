@@ -10,6 +10,7 @@ import {MicroLcNotificationCenter} from './micro-lc-notification-center'
 
 const DEFAULT_NOCK_ENDPOINT = 'http://localhost'
 const NOTIFICATIONS = '/notifications'
+const NOTIFICATIONS_FETCH = `${NOTIFICATIONS}/own`
 const endpoint = `${DEFAULT_NOCK_ENDPOINT}${NOTIFICATIONS}`
 const mocks = {react: ['createElement'], 'react-dom': ['render', 'unmountComponentAtNode']}
 
@@ -24,7 +25,7 @@ const mocks = {react: ['createElement'], 'react-dom': ['render', 'unmountCompone
  */
 function init (status: 'ok' | 'nok', skip = 0, limit = DEFAULT_PAGINATION_LIMIT): Notification[] | undefined {
   const scope = nock(DEFAULT_NOCK_ENDPOINT)
-    .get(NOTIFICATIONS)
+    .get(NOTIFICATIONS_FETCH)
     .query({skip, limit})
   if(status === 'ok') {
     const notifications = mockNotifications(limit)
@@ -77,9 +78,19 @@ describe('micro-lc-notification-center lifecycle tests', () => {
   })
 
   it('should avoid fetching notifications on absent endopoint', async () => {
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .get('/api/v1/micro-lc-notification-center/own')
+      .query({skip: 0, limit: DEFAULT_PAGINATION_LIMIT})
+      .reply(200, [])
     const {react: {createElement}} = sandboxMocks
-    await create()
-    expect(call(createElement, 0)[1]).toMatchObject({loading: undefined, notifications: []})
+    const page = await create()
+    expect(call(createElement, 0)[1]).toMatchObject({loading: true, notifications: []})
+
+    // await for fetching and check the response
+    await waitForChanges(page, () => {
+      expect(nock.isDone()).toBe(true)
+    })
+    expect(call(createElement, 1)[1]).toMatchObject({loading: false, notifications: []})
   })
 
   it('should render, then fetch notifications, after that it should be removed and on remount it should\'n fetch again', async () => {

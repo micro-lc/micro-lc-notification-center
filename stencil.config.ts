@@ -1,10 +1,10 @@
 import {generate} from '@ant-design/colors'
+import {nodeResolve} from '@rollup/plugin-node-resolve';
 import {Config} from '@stencil/core'
 import analyze from 'rollup-plugin-analyzer'
 import css from 'rollup-plugin-import-css'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
-
-
+import {terser} from 'rollup-plugin-terser'
 
 /**
  * ANT Design holds a fixed set of default color variables
@@ -34,12 +34,15 @@ const transform = (text: string): string => {
 }
 
 export const config: Config = {
+  minifyJs: true,
   enableCache: true,
   rollupPlugins: {
     before: [
+      nodeResolve(),
       css({transform}),
     ],
     after: [
+      terser({keep_fnames: true, keep_classnames: true}),
       analyze({summaryOnly: true, limit: 5}),
       nodePolyfills()
     ]

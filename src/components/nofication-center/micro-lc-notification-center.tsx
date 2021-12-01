@@ -8,6 +8,8 @@ import {PartialTranslations} from '../../lib/utils/i18n.utils'
 import {DEFAULT_PAGINATION_LIMIT, getNotifications} from '../../utils/notificationsClient'
 import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
 
+const DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT = '/api/v1/micro-lc-notification-center'
+
 /**
  * This is the micro-lc notification center web-component
  */
@@ -19,7 +21,8 @@ export class MicroLcNotificationCenter {
   @Element() element: HTMLElement
 
   /**
-   * `endpoint` is the http client url to fetch notifications.
+   * `endpoint` (optional) is the http client url to fetch notifications.
+   * It defaults to relative ref: `/api/v1/micro-lc-notification-center`.
    * It can also be used as a plain attribute by setting
    * ```html
    * <body>
@@ -29,7 +32,13 @@ export class MicroLcNotificationCenter {
    * </body>
    * ```
    */
-  @Prop() endpoint: string
+  @Prop() endpoint = DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT
+  /**
+   * `limit` (optional) controls pagination limit 
+   * while fetching notifications. It is also an HTML 
+   * attribute.
+   */
+  @Prop() limit = DEFAULT_PAGINATION_LIMIT
   /**
    * `headers` (optional) is a key-value list of 
    * http headers to attach to the http client that
@@ -53,18 +62,15 @@ export class MicroLcNotificationCenter {
    * ```
    */
   @Prop() locales: PartialTranslations = {}
-  /**
-   * `limit` (optional) controls pagination limit 
-   * while fetching notifications. It is also an HTML 
-   * attribute.
-   */
-  @Prop() limit = DEFAULT_PAGINATION_LIMIT
   
   @State() notifications: Notification[] = []
   @State() loading: boolean | undefined
   @State() page: Pagination = {skip: 0}
-  @State() error: boolean = false
+  @State() error = false
+  @State() done = false
 
+  private fetch: (skip: number) => Promise<Notification[]> = getNotifications.bind(this)
+  private handleClick: (_id: string) => void
   private wasDetached = false
 
   private postRetrieval(skipDone: number): void {
@@ -79,7 +85,9 @@ export class MicroLcNotificationCenter {
         next: () => this.loadNotifications(this.page.skip, false),
         reload: () => this.loadNotifications(0, true),
         locales: this.locales,
-        error: this.error
+        error: this.error,
+        done: this.done,
+        onClick: this.handleClick
       }
     )
   }
@@ -89,13 +97,17 @@ export class MicroLcNotificationCenter {
   }
 
   private async loadNotifications(page = 0, reload = true): Promise<void> {
-    this.loading = true 
-    const handler = getNotifications.bind(this) as (skip: number) => Promise<Notification[]>
-    await handler(page)
+    this.loading = true
+    this.done = false 
+    await this.fetch(page)
       .then((notifications) => {
         this.error = false
         this.notifications = reload ? notifications : [...this.notifications, ...notifications]
         this.postRetrieval(page)
+
+        if(notifications.length === 0 || notifications.length < this.limit) {
+          this.done = true
+        }
       })
       .catch(() => {
         this.error = true
@@ -122,9 +134,7 @@ export class MicroLcNotificationCenter {
      * If the component is disconnected and re-connected this 
      * step is not needed since it memory content is not erased
      */
-    if(this.endpoint) {
-      this.loadNotifications()
-    }
+    this.loadNotifications()
   }
   
   componentDidRender() {

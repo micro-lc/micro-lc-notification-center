@@ -10,7 +10,7 @@ import { PartialTranslations } from "./lib/utils/i18n.utils";
 export namespace Components {
     interface MicroLcNotificationCenter {
         /**
-          * `endpoint` is the http client url to fetch notifications. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
+          * `endpoint` (optional) is the http client url to fetch notifications. It defaults to relative ref: `/api/v1/micro-lc-notification-center`. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
          */
         "endpoint": string;
         /**
@@ -41,7 +41,7 @@ declare global {
 declare namespace LocalJSX {
     interface MicroLcNotificationCenter {
         /**
-          * `endpoint` is the http client url to fetch notifications. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
+          * `endpoint` (optional) is the http client url to fetch notifications. It defaults to relative ref: `/api/v1/micro-lc-notification-center`. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
          */
         "endpoint"?: string;
         /**
