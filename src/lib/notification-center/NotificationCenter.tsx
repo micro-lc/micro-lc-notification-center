@@ -1,13 +1,14 @@
 import React, {ReactElement, useMemo} from 'react'
 
-import {BellOutlined, ReloadOutlined} from '@ant-design/icons'
-import {Button, Popover, Row, Col} from 'antd'
+import {BellOutlined} from '@ant-design/icons'
+import {Button, Popover} from 'antd'
 import antd from 'antd/dist/antd.css'
 
 import {parseCssVariable, setCssVariables} from '../utils/css.utils'
-import {I18n, DefaultTranslations, PartialTranslations, useLocale} from '../utils/i18n.utils'
+import {I18n, DefaultTranslations, PartialTranslations} from '../utils/i18n.utils'
 import styles from './notification-center.css'
 import NotificationsList from './NotificationsList'
+import PopupTitle from './PopupTitle'
 
 const MICROLC_PRIMARY_COLOR_VAR = '--microlc-primary-color'
 
@@ -30,7 +31,9 @@ export type NotificationCenterProps = {
 const defaultTranslations: DefaultTranslations = {
   title: 'Notifications', 
   loadingButton: 'Load More', 
-  dateFormat: 'YYYY-MM-DD'
+  dateFormat: 'YYYY-MM-DD',
+  noNotification: 'No notification to show',
+  errorMessage: 'An error occurred, try again'
 }
 
 function NotificationCenter ({
@@ -38,48 +41,31 @@ function NotificationCenter ({
   loading, 
   locales, 
   reload, 
-  next
+  next,
+  error
 }: NotificationCenterProps): ReactElement {
   const microlcPrimaryColor = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue(MICROLC_PRIMARY_COLOR_VAR), [])
-  const {t} = useLocale()
-
-  const Title = () => (
-    <Row>
-      <Col span={20}>
-        <h2 className='notification-header'>{t('title')}</h2>
-      </Col>
-      <Col span={4}>
-        <Button 
-          icon={<ReloadOutlined />} 
-          loading={loading} 
-          onClick={reload} 
-          shape='circle' 
-          style={{marginLeft: '10px'}} 
-          type='text' 
-        />
-      </Col>
-    </Row>
-  )
-
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
       <style>{setCssVariables(microlcPrimaryColor)}</style>
       <style>{parseCssVariable([styles, antd])}</style>
       <Popover 
-        content={
+        arrowPointAtCenter
+        content={ 
           <NotificationsList 
-            loading={loading} 
-            next={next} 
+            error={error} 
+            loading={loading}
+            next={next}
             notifications={notifications}
           />
-        } 
+        }
         placement='bottomRight' 
-        title={<Title />} 
+        title={<PopupTitle loading={loading} reload={reload} />} 
         trigger='click'
       >
         <Button 
           shape='circle' 
-          style={{color: 'white'}} 
+          style={{color: 'white', padding: 'initial'}} 
           type='primary'
         >
           <BellOutlined />
