@@ -1,6 +1,6 @@
 {
   "setupFilesAfterEnv": ["<rootDir>/test-setup.ts"],
-  "moduleNameMapper":{
+  "moduleNameMapper": {
     "\\.css$": "<rootDir>/__mocks__/styleMock.js"
   },
   "coverageThreshold": {
@@ -14,5 +14,11 @@
   "coverageReporters": [
     "text",
     "lcov"
+  ],
+  "collectCoverageFrom": [
+    "utils/**/*.ts",
+    "notification-center/**/*.tsx",
+    "notification-center/**/*.ts",
+    "!utils/test.utils.ts"
   ]
 }

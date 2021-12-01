@@ -14,7 +14,7 @@ const MICROLC_PRIMARY_COLOR_VAR = '--microlc-primary-color'
 export type Notification = {
   _id: string
   creatorId: string
-  createdAt: Date
+  createdAt: string
   title: string
 }
 
@@ -24,6 +24,7 @@ export type NotificationCenterProps = {
   next?: () => void
   reload?: () => void
   locales?: PartialTranslations
+  error?: boolean
 }
 
 const defaultTranslations: DefaultTranslations = {
@@ -89,3 +90,4 @@ function NotificationCenter ({
 }
 
 export default NotificationCenter
+export {defaultTranslations}

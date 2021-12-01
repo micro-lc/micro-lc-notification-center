@@ -27,7 +27,7 @@ function useLocale () {
       const availableKeys = Object.keys(translation)
       if(availableKeys.includes(lang)) {
         return translation[lang]
-      } else if (lang.length > 2 && availableKeys.includes(lang.substring(0, 2))) {
+      } else if (availableKeys.includes(lang.substring(0, 2))) {
         return translation[lang.substring(0, 2)]
       }
       

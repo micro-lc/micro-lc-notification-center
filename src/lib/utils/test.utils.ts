@@ -31,4 +31,4 @@ const genNotifications = (quantity: number) => Array(quantity).fill(0).map(() =>
   title: randomString()
 }))
 
-export {genNotifications}
+export {genNotifications, randomString}

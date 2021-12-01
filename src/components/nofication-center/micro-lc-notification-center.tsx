@@ -8,6 +8,9 @@ import {PartialTranslations} from '../../lib/utils/i18n.utils'
 import {DEFAULT_PAGINATION_LIMIT, getNotifications} from '../../utils/notificationsClient'
 import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
 
+/**
+ * This is the micro-lc notification center web-component
+ */
 @Component({
   tag: 'micro-lc-notification-center',
   shadow: true
@@ -15,14 +18,52 @@ import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
 export class MicroLcNotificationCenter {
   @Element() element: HTMLElement
 
+  /**
+   * `endpoint` is the http client url to fetch notifications.
+   * It can also be used as a plain attribute by setting
+   * ```html
+   * <body>
+   *   <micro-lc-notification-center
+   *     endpoint="https://example.com/my-notifications"
+   *   ></micro-lc-notification-center>
+   * </body>
+   * ```
+   */
   @Prop() endpoint: string
+  /**
+   * `headers` (optional) is a key-value list of 
+   * http headers to attach to the http client that
+   * fetches notifications
+   */
   @Prop() headers: MicroLcHeaders = {}
+  /**
+   * `locales` (optional) is a key-value list to 
+   * allow i18n support. Keys are paired to either a string,
+   * which overrides language support or to a key-value map
+   * that matches a language to a translation
+   * 
+   * ```javascript
+   * const locales = {
+   *   title: "A Title",
+   *   subtitle: {
+   *     en: "A i18n subtitle",
+   *     it-IT: "Un sottotitolo internazionalizzato"
+   *   }
+   * }
+   * ```
+   */
   @Prop() locales: PartialTranslations = {}
+  /**
+   * `limit` (optional) controls pagination limit 
+   * while fetching notifications. It is also an HTML 
+   * attribute.
+   */
   @Prop() limit = DEFAULT_PAGINATION_LIMIT
   
   @State() notifications: Notification[] = []
   @State() loading: boolean | undefined
   @State() page: Pagination = {skip: 0}
+  @State() error: boolean = false
 
   private wasDetached = false
 
@@ -37,7 +78,8 @@ export class MicroLcNotificationCenter {
         notifications: this.notifications,
         next: () => this.loadNotifications(this.page.skip, false),
         reload: () => this.loadNotifications(0, true),
-        locales: this.locales
+        locales: this.locales,
+        error: this.error
       }
     )
   }
@@ -46,13 +88,21 @@ export class MicroLcNotificationCenter {
     ReactDOM.render(this.create(), this.element)
   }
 
-  private loadNotifications(page = 0, reload = true): void {
+  private async loadNotifications(page = 0, reload = true): Promise<void> {
     this.loading = true 
     const handler = getNotifications.bind(this) as (skip: number) => Promise<Notification[]>
-    handler(page).then((notifications) => {
-      this.notifications = reload ? notifications : [...this.notifications, ...notifications]
-      this.postRetrieval(page)
-    }).finally(() => {this.loading = false})
+    await handler(page)
+      .then((notifications) => {
+        this.error = false
+        this.notifications = reload ? notifications : [...this.notifications, ...notifications]
+        this.postRetrieval(page)
+      })
+      .catch(() => {
+        this.error = true
+      })
+      .finally(() => {
+        this.loading = false
+      })
   }
 
   connectedCallback() {
@@ -72,7 +122,7 @@ export class MicroLcNotificationCenter {
      * If the component is disconnected and re-connected this 
      * step is not needed since it memory content is not erased
      */
-    if(this.endpoint && this.page.last === undefined) {
+    if(this.endpoint) {
       this.loadNotifications()
     }
   }

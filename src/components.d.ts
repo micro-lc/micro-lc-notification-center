@@ -9,9 +9,21 @@ import { MicroLcHeaders } from "./components/nofication-center/micro-lc-notifica
 import { PartialTranslations } from "./lib/utils/i18n.utils";
 export namespace Components {
     interface MicroLcNotificationCenter {
+        /**
+          * `endpoint` is the http client url to fetch notifications. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
+         */
         "endpoint": string;
+        /**
+          * `headers` (optional) is a key-value list of  http headers to attach to the http client that fetches notifications
+         */
         "headers": MicroLcHeaders;
+        /**
+          * `limit` (optional) controls pagination limit  while fetching notifications. It is also an HTML  attribute.
+         */
         "limit": number;
+        /**
+          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: "A Title",   subtitle: {     en: "A i18n subtitle",     it-IT: "Un sottotitolo internazionalizzato"   } } ```
+         */
         "locales": PartialTranslations;
     }
 }
@@ -28,9 +40,21 @@ declare global {
 }
 declare namespace LocalJSX {
     interface MicroLcNotificationCenter {
+        /**
+          * `endpoint` is the http client url to fetch notifications. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
+         */
         "endpoint"?: string;
+        /**
+          * `headers` (optional) is a key-value list of  http headers to attach to the http client that fetches notifications
+         */
         "headers"?: MicroLcHeaders;
+        /**
+          * `limit` (optional) controls pagination limit  while fetching notifications. It is also an HTML  attribute.
+         */
         "limit"?: number;
+        /**
+          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: "A Title",   subtitle: {     en: "A i18n subtitle",     it-IT: "Un sottotitolo internazionalizzato"   } } ```
+         */
         "locales"?: PartialTranslations;
     }
     interface IntrinsicElements {

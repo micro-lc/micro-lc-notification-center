@@ -1,6 +1,10 @@
 import {generate} from '@ant-design/colors'
 import {Config} from '@stencil/core'
+import analyze from 'rollup-plugin-analyzer'
 import css from 'rollup-plugin-import-css'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
+
+
 
 /**
  * ANT Design holds a fixed set of default color variables
@@ -30,9 +34,14 @@ const transform = (text: string): string => {
 }
 
 export const config: Config = {
+  enableCache: true,
   rollupPlugins: {
     before: [
       css({transform}),
+    ],
+    after: [
+      analyze({summaryOnly: true, limit: 5}),
+      nodePolyfills()
     ]
   },
   namespace: 'micro-lc-notification-center',
@@ -42,23 +51,21 @@ export const config: Config = {
       esmLoaderPath: '../loader',
     },
     {
-      type: 'dist-custom-elements-bundle',
-    },
-    {
-      type: 'docs-readme',
-    },
-    {
       type: 'www',
       copy: [{'src': 'assets', warn: true}],
       serviceWorker: null,
     },
   ],
   testing: {
+    roots: ['src'],
     moduleNameMapper:{
       '\\.css$': 'identity-obj-proxy'
     },
     testPathIgnorePatterns: ['/node_modules/', '/src/lib/'],
-    collectCoverageFrom: ['/components/'],
+    collectCoverageFrom: [
+      'src/components/**/*.tsx',
+      '!/src/lib/'
+    ],
     coverageThreshold: {
       global: {
         statements: 80,

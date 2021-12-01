@@ -1,3 +1,5 @@
+import {SpecPage} from '@stencil/core/internal'
+
 import {Notification} from '../lib'
 
 const START_DAYS_AGO = 90
@@ -12,8 +14,8 @@ function genId () {
     }).toLowerCase()
 }
 
-function randomDate(start = startFrom, end = today) {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+function randomDate(start = startFrom, end = today): string {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
 }
 
 function randomString(length = 10) {
@@ -37,7 +39,7 @@ type WaitForOptions = {
   timeout: number
 }
 
-async function waitFor<T = any> (callback?: () => T, opts: WaitForOptions = {timeout: 3000}): Promise<T> {
+async function waitForChanges<T = any> (page: SpecPage, callback?: () => T, opts: WaitForOptions = {timeout: 3000}): Promise<T> {
   let reason: any = undefined
   let outsideResolve: (value: T | PromiseLike<T>) => void
   let outsideReject: (reason?: any) => void
@@ -57,7 +59,9 @@ async function waitFor<T = any> (callback?: () => T, opts: WaitForOptions = {tim
     outsideReject(reason)
   }, opts.timeout)
 
-  return promise
+  return await promise
+    .then(() => clearInterval(interval))
+    .then(() => page.waitForChanges())
 }
 
-export {mockNotifications, waitFor}
+export {mockNotifications, waitForChanges}
