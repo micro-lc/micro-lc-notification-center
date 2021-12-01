@@ -17,6 +17,7 @@ export type Notification = {
   creatorId: string
   createdAt: string
   title: string
+  readState?: boolean
 }
 
 export type NotificationCenterProps = {
