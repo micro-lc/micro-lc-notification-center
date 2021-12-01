@@ -50,9 +50,18 @@ function NotificationCenter ({
   locales, 
   reload, 
   next,
-  error
+  error,
+  done,
+  onClick,
+  onClickAll
 }: NotificationCenterProps): ReactElement {
   const microlcPrimaryColor = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue(MICROLC_PRIMARY_COLOR_VAR), [])
+  let customNotifications = notifications
+
+  const markAsRead = (id) => {
+    onClick(id)
+  }
+
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
       <style>{setCssVariables(microlcPrimaryColor)}</style>
@@ -61,14 +70,16 @@ function NotificationCenter ({
         arrowPointAtCenter
         content={ 
           <NotificationsList 
-            error={error} 
+            done={done} 
+            error={error}
             loading={loading}
             next={next}
-            notifications={notifications}
+            notifications={customNotifications}
+            onClick={markAsRead}
           />
         }
         placement='bottomRight' 
-        title={<PopupTitle loading={loading} reload={reload} />} 
+        title={<PopupTitle loading={loading} onClickAll={onClickAll} reload={reload} />} 
         trigger='click'
       >
         <Button 
