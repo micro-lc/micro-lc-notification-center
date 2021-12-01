@@ -1,16 +1,15 @@
-import React, {ReactElement, useMemo} from 'react'
+import React, {ReactElement} from 'react'
 
 import {BellOutlined} from '@ant-design/icons'
 import {Button, Popover} from 'antd'
 import antd from 'antd/dist/antd.variable.min.css'
 
-import {parseCssVariable, setCssVariables} from '../utils/css.utils'
+import {parseCssVariable} from '../utils/css.utils'
 import {I18n, DefaultTranslations, PartialTranslations} from '../utils/i18n.utils'
 import styles from './notification-center.css'
 import NotificationsList from './NotificationsList'
 import PopupTitle from './PopupTitle'
 
-const MICROLC_PRIMARY_COLOR_VAR = '--microlc-primary-color'
 
 type ReadStateHandler = (notification: Notification, index: number) => Promise<void>
 
@@ -55,11 +54,9 @@ function NotificationCenter ({
   onClick,
   onClickAll
 }: NotificationCenterProps): ReactElement {
-  const microlcPrimaryColor = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue(MICROLC_PRIMARY_COLOR_VAR), [])
-  
+
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
-      <style>{setCssVariables(microlcPrimaryColor)}</style>
       <style>{parseCssVariable([styles, antd])}</style>
       <Popover 
         arrowPointAtCenter

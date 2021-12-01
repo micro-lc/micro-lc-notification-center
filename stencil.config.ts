@@ -31,6 +31,8 @@ export const config: Config = {
     testPathIgnorePatterns: ['/node_modules/', '/src/lib/'],
     collectCoverageFrom: [
       'src/components/**/*.tsx',
+      'src/components/**/*.ts',
+      'src/utils/**/*.ts',
       '!/src/lib/'
     ],
     coverageThreshold: {

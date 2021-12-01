@@ -1,14 +1,19 @@
-import React from 'react'
-
 import {h, Component, Host, Element, Prop, State} from '@stencil/core'
-import ReactDOM from 'react-dom'
 
 import {NotificationCenter, Notification, NotificationCenterProps} from '../../lib'
 import {PartialTranslations} from '../../lib/utils/i18n.utils'
-import {DEFAULT_PAGINATION_LIMIT, getNotifications, patchReadState, patchAllReadState} from '../../utils/notificationsClient'
-import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
+import {DEFAULT_PAGINATION_LIMIT} from '../../utils/notificationsClient'
+import {reactRender, unmountComponentAtNode, Creatable, shadowRootCSS} from '../engine'
+import {loadNotifications, onClick, onClickAll} from './micro-lc-notification-center.lib'
 
 const DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT = '/api/v1/micro-lc-notification-center'
+
+type Pagination = {
+  skip: number
+  last?: number
+}
+
+export type MicroLcHeaders = Record<string, string>
 
 /**
  * This is the micro-lc notification center web-component
@@ -17,7 +22,7 @@ const DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT = '/api/v1/micro-lc-notification-ce
   tag: 'micro-lc-notification-center',
   shadow: true
 })
-export class MicroLcNotificationCenter {
+export class MicroLcNotificationCenter implements Creatable<NotificationCenterProps> {
   @Element() element: HTMLElement
 
   /**
@@ -53,10 +58,10 @@ export class MicroLcNotificationCenter {
    * 
    * ```javascript
    * const locales = {
-   *   title: "A Title",
+   *   title: 'A Title',
    *   subtitle: {
-   *     en: "A i18n subtitle",
-   *     it-IT: "Un sottotitolo internazionalizzato"
+   *     en: 'A i18n subtitle',
+   *     'it-IT': 'Un sottotitolo internazionalizzato'
    *   }
    * }
    * ```
@@ -69,86 +74,48 @@ export class MicroLcNotificationCenter {
   @State() error = false
   @State() done = false
 
-  private wasDetached = false
+  /**
+   * React fields
+   */
+  Component = NotificationCenter
+  wasDetached = false
+  rerender = reactRender.bind(this)
+  unmount = unmountComponentAtNode.bind(this)
+  shadowRootCSS = shadowRootCSS.bind(this)
 
-  private fetch: (skip: number) => Promise<Notification[]> = getNotifications.bind(this)
+  /**
+   * Component fields
+   */
+  loadNotifications = (reload?: boolean) => loadNotifications.bind(this)(reload)
+  onClick = onClick.bind(this)
+  onClickAll = onClickAll.bind(this)
 
-  private async loadNotifications(page = 0, reload = true): Promise<void> {
-    this.loading = true
-    this.done = false 
-    await this.fetch(page)
-      .then((notifications) => {
-        this.error = false
-        this.notifications = reload ? notifications : [...this.notifications, ...notifications]
-        this.postRetrieval(page)
-
-        if(notifications.length === 0 || notifications.length < this.limit) {
-          this.done = true
-        }
-      })
-      .catch(() => {
-        this.error = true
-      })
-      .finally(() => {
-        this.loading = false
-      })
-  }
-
-  private postRetrieval(skipDone: number): void {
-    this.page = {skip: skipDone + this.limit, last: skipDone}
-  }
-
-  private create(): React.FunctionComponentElement<NotificationCenterProps> {
-    return React.createElement(
-      NotificationCenter, {
-        loading: this.loading, 
-        notifications: this.notifications,
-        next: () => this.loadNotifications(this.page.skip, false),
-        reload: () => this.loadNotifications(0, true),
-        locales: this.locales,
-        error: this.error,
-        done: this.done,
-        onClick: async ({readState, ...rest}: Notification, index: number) => {
-          if(!readState) {
-            const newReadState = !readState
-            return await patchReadState.bind(this)(rest._id, newReadState)
-              .then(() => {
-                this.notifications = [
-                  ...this.notifications.slice(0, index), 
-                  {...rest, readState: newReadState},
-                  ...this.notifications.slice(index + 1)
-                ]
-              })
-          }
-        },
-        onClickAll: async () => {
-          const number = patchAllReadState.bind(this)()
-            .then((res: number) => {
-              this.notifications = this.notifications.map((el) => {
-                  el.readState = true
-                  return el
-                })
-              return res
-            })
-          return number
-        }
-      }
-    )
-  }
-
-  private renderToDOM(): void {
-    ReactDOM.render(this.create(), this.element)
+  /**
+   * Bind `this` to match react element props
+   * @returns react element props
+   */
+  create(): NotificationCenterProps {
+    return {
+      loading: this.loading, 
+      notifications: this.notifications,
+      next: this.loadNotifications,
+      reload: () => this.loadNotifications(true),
+      locales: this.locales,
+      error: this.error,
+      done: this.done,
+      onClick: this.onClick, 
+      onClickAll: this.onClickAll
+    }
   }
 
   connectedCallback() {
+    this.shadowRootCSS('micro-lc-notification-center-style')
     /** 
      * There's no need of rendering when attaching the component.
      * If the component is disconnected and then re-connected a single
      * re-render is needed in order to re-apply the shadowed React component within
      */
-    if(this.wasDetached) {
-      this.renderToDOM()
-    }
+    this.rerender(this.wasDetached)
   }
 
   componentWillLoad() {
@@ -157,19 +124,16 @@ export class MicroLcNotificationCenter {
      * If the component is disconnected and re-connected this 
      * step is not needed since it memory content is not erased
      */
-    this.loadNotifications()
+    this.loadNotifications(true)
   }
   
-  componentDidRender() {
-    this.renderToDOM()
-  }
-
   disconnectedCallback() {
-    this.wasDetached = true
-    ReactDOM.unmountComponentAtNode(this.element)
+    this.unmount()
   }
 
-  render() { 
-    return h(Host, null, h('slot'))
+  render() {
+    const host = h(Host, null, h('slot'))
+    this.rerender()
+    return host
   }
 }

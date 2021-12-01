@@ -310,6 +310,14 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     })
   })
 
+  it('shouldn\'t do anything on readState === true', async () => {
+    const {react: {createElement}} = sandboxMocks
+    await initStandard()
+    const {onClick} = call(createElement)[1]
+
+    await onClick({readState: true})
+  })
+
   it('should throw on `_id` empty string', async () => {
     const {react: {createElement}} = sandboxMocks
     await initStandard()

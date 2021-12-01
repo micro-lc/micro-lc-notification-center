@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { MicroLcHeaders } from "./components/nofication-center/micro-lc-notification-center.types";
+import { MicroLcHeaders } from "./components/nofication-center/micro-lc-notification-center";
 import { PartialTranslations } from "./lib/utils/i18n.utils";
 export namespace Components {
     interface MicroLcNotificationCenter {
@@ -22,7 +22,7 @@ export namespace Components {
          */
         "limit": number;
         /**
-          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: "A Title",   subtitle: {     en: "A i18n subtitle",     it-IT: "Un sottotitolo internazionalizzato"   } } ```
+          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
          */
         "locales": PartialTranslations;
     }
@@ -53,7 +53,7 @@ declare namespace LocalJSX {
          */
         "limit"?: number;
         /**
-          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: "A Title",   subtitle: {     en: "A i18n subtitle",     it-IT: "Un sottotitolo internazionalizzato"   } } ```
+          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
          */
         "locales"?: PartialTranslations;
     }
