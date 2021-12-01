@@ -3,7 +3,7 @@ import React from 'react'
 import {h, Component, Host, Element, Prop, State} from '@stencil/core'
 import ReactDOM from 'react-dom'
 
-import {NotificationCenter, Notification, NotificationCenterProps} from '../../lib'
+import {NotificationCenter, Notification, NotificationCenterProps, ReadStateHandler} from '../../lib'
 import {PartialTranslations} from '../../lib/utils/i18n.utils'
 import {DEFAULT_PAGINATION_LIMIT, getNotifications} from '../../utils/notificationsClient'
 import {MicroLcHeaders, Pagination} from './micro-lc-notification-center.types'
@@ -64,13 +64,14 @@ export class MicroLcNotificationCenter {
   @Prop() locales: PartialTranslations = {}
   
   @State() notifications: Notification[] = []
-  @State() loading: boolean | undefined
+  @State() loading?: boolean
   @State() page: Pagination = {skip: 0}
   @State() error = false
   @State() done = false
 
   private fetch: (skip: number) => Promise<Notification[]> = getNotifications.bind(this)
-  private handleClick: (_id: string) => void
+  private handleReadState: ReadStateHandler
+  private handleAllReadState: ReadStateHandler
   private wasDetached = false
 
   private postRetrieval(skipDone: number): void {
@@ -87,7 +88,8 @@ export class MicroLcNotificationCenter {
         locales: this.locales,
         error: this.error,
         done: this.done,
-        onClick: this.handleClick
+        onClick: this.handleReadState,
+        onClickAll: this.handleAllReadState
       }
     )
   }

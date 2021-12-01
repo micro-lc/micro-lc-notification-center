@@ -12,6 +12,8 @@ import PopupTitle from './PopupTitle'
 
 const MICROLC_PRIMARY_COLOR_VAR = '--microlc-primary-color'
 
+export type ReadStateHandler = (_id?: string) => void
+
 export type Notification = {
   _id: string
   creatorId: string
@@ -22,13 +24,14 @@ export type Notification = {
 
 export type NotificationCenterProps = {
   loading?: boolean
-  notifications?: Notification[]
-  next?: () => void
-  reload?: () => void
-  locales?: PartialTranslations
-  error?: boolean
-  done?: boolean
-  onClick?: (_id: string) => void
+  notifications: Notification[]
+  next: () => void
+  reload: () => void
+  locales: PartialTranslations
+  error: boolean
+  done: boolean
+  onClick: ReadStateHandler
+  onClickAll: ReadStateHandler
 }
 
 const defaultTranslations: DefaultTranslations = {
@@ -40,7 +43,7 @@ const defaultTranslations: DefaultTranslations = {
 }
 
 function NotificationCenter ({
-  notifications = [], 
+  notifications, 
   loading, 
   locales, 
   reload, 
