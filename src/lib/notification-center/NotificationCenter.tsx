@@ -2,7 +2,7 @@ import React, {ReactElement, useMemo} from 'react'
 
 import {BellOutlined} from '@ant-design/icons'
 import {Button, Popover} from 'antd'
-import antd from 'antd/dist/antd.css'
+import antd from 'antd/dist/antd.variable.min.css'
 
 import {parseCssVariable, setCssVariables} from '../utils/css.utils'
 import {I18n, DefaultTranslations, PartialTranslations} from '../utils/i18n.utils'

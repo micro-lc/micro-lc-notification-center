@@ -81,8 +81,11 @@ This endpoint should change the read state of a specific notification given its 
 
 ```json
 {
-  "readState": {
-    "type": "boolean"
+  "type": "object",
+  "properties": {
+    "readState": {
+      "type": "boolean"
+    }
   }
 }
 ```
@@ -93,8 +96,11 @@ This endpoint should change the read state of all the notifications that the cur
 
 ```json
 {
-  "readState": {
-    "type": "boolean"
+  "type": "object",
+  "properties": {
+    "readState": {
+      "type": "boolean"
+    }
   }
 }
 ```
