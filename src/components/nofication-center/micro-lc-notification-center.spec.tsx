@@ -299,12 +299,12 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     const {react: {createElement}} = sandboxMocks
     const page = await initStandard()
     const {notifications, onClick} = call(createElement)[1]
-    const [{_id, readState}] = notifications
+    const [notification] = notifications
 
     nock(DEFAULT_NOCK_ENDPOINT)
-      .patch(`${NOTIFICATIONS}/read-state/${_id}`, {readState: true})
+      .patch(`${NOTIFICATIONS}/read-state/${notification._id}`, {readState: true})
       .reply(200)
-    onClick(_id, readState)
+    onClick(notification, 0)
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
@@ -315,7 +315,7 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     await initStandard()
     const {onClick} = call(createElement)[1]
 
-    await onClick('').catch((err: any) => {
+    await onClick({}).catch((err: any) => {
       expect(err.message).toStrictEqual('`_id` cannot be undefined or an empty string')
     })
   })

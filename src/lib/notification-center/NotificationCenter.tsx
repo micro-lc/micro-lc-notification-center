@@ -12,7 +12,7 @@ import PopupTitle from './PopupTitle'
 
 const MICROLC_PRIMARY_COLOR_VAR = '--microlc-primary-color'
 
-type ReadStateHandler = (_id: string, readState?: boolean) => Promise<void>
+type ReadStateHandler = (notification: Notification, index: number) => Promise<void>
 
 type AllReadStateHandler = () => Promise<number>
 
@@ -56,12 +56,7 @@ function NotificationCenter ({
   onClickAll
 }: NotificationCenterProps): ReactElement {
   const microlcPrimaryColor = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue(MICROLC_PRIMARY_COLOR_VAR), [])
-  let customNotifications = notifications
-
-  const markAsRead = (id) => {
-    onClick(id)
-  }
-
+  
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
       <style>{setCssVariables(microlcPrimaryColor)}</style>
@@ -74,8 +69,8 @@ function NotificationCenter ({
             error={error}
             loading={loading}
             next={next}
-            notifications={customNotifications}
-            onClick={markAsRead}
+            notifications={notifications}
+            onClick={onClick}
           />
         }
         placement='bottomRight' 

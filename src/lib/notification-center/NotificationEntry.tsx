@@ -6,23 +6,20 @@ import 'dayjs/locale/en'
 import 'dayjs/locale/it'
 
 import {useLocale} from '../utils/i18n.utils'
+import {Notification} from './NotificationCenter'
 
-export type NotificationEntryProps = {
-    title?: string
-    date?: string
-    readState?: boolean
-    id?: string
-    onClick?
-  }
+export type NotificationEntryProps = Notification & {
+  onClick: () => void
+}
 
-export default function NotificationEntry ({title, date, readState, id, onClick}: NotificationEntryProps) : ReactElement {
+export default function NotificationEntry ({title, createdAt, readState, onClick}: NotificationEntryProps) : ReactElement {
   const {t, lang} = useLocale()
 
   return (
     <Fragment>
-      <List.Item onClick={() => onClick(id)}>
+      <List.Item onClick={onClick}>
         <List.Item.Meta
-          description={dayjs(date).locale(lang).format(t('dateFormat'))}
+          description={dayjs(createdAt).locale(lang).format(t('dateFormat'))}
           title={title}
         />
         {readState === true ? <Fragment/> : <Badge color='magenta'/>}

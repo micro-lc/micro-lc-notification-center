@@ -108,8 +108,30 @@ export class MicroLcNotificationCenter {
         locales: this.locales,
         error: this.error,
         done: this.done,
-        onClick: (_id: string, readState?: boolean) => patchReadState.bind(this)(_id, !readState),
-        onClickAll: patchAllReadState.bind(this)
+        onClick: async ({readState, ...rest}: Notification, index: number) => {
+          if(!readState) {
+            const newReadState = !readState
+            return await patchReadState.bind(this)(rest._id, newReadState)
+              .then(() => {
+                this.notifications = [
+                  ...this.notifications.slice(0, index), 
+                  {...rest, readState: newReadState},
+                  ...this.notifications.slice(index + 1)
+                ]
+              })
+          }
+        },
+        onClickAll: async () => {
+          const number = patchAllReadState.bind(this)()
+            .then((res: number) => {
+              this.notifications = this.notifications.map((el) => {
+                  el.readState = true
+                  return el
+                })
+              return res
+            })
+          return number
+        }
       }
     )
   }
