@@ -47,17 +47,6 @@ function call<T = any, A extends any[] = any> ({mock: {calls}}: jest.Mock<T, A>,
 }
 
 /**
- * utility function to extract the `micro-lc-notification-center`
- * webcomponent and its parent
- * @param page 
- * @returns an object containing the `notificationCenter` and the `host`
- */
-function _get (page: SpecPage): {notificationCenter: HTMLMicroLcNotificationCenterElement; host: HTMLElement} {
-  const notificationCenter = page.body.querySelector('micro-lc-notification-center')
-  return {notificationCenter, host: notificationCenter.parentElement}
-}
-
-/**
  * utility function to create a new `spec-page` with a `micro-lc-notification-center`
  * embedded
  * @param props props to attach to `micro-lc-notification-center`
@@ -106,13 +95,16 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     })
     expect(call(createElement, 1)[1]).toMatchObject({loading: false, notifications})
 
-    // attempt DOM removal of the `notification-center`
-    const {notificationCenter, host} = _get(page)
-    notificationCenter.remove()
+    // pick the host (which is root), remove it from the body
+    // and check the react component is unmounted
+    // and renders are 2
+    const host = page.root
+    page.body.removeChild(host)
     expect(unmountComponentAtNode).toBeCalledTimes(1)
+    expect(render).toBeCalledTimes(2)
 
-    // re-attaching and chech that there is no extra notifications fetch
-    host.appendChild(notificationCenter)
+    // re-attach and check there's no extra nock get request
+    page.body.appendChild(host)
     await waitForChanges(page, () => {
       expect(render).toBeCalledTimes(3)
     })

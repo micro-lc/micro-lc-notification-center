@@ -54,14 +54,17 @@ async function waitForChanges<T = any> (page: SpecPage, callback?: () => T, opts
       reason = err
     }
   }, 100)
-  setTimeout(() => {
+  const timeout = setTimeout(() => {
     clearInterval(interval)
     outsideReject(reason)
   }, opts.timeout)
 
   return await promise
-    .then(() => clearInterval(interval))
     .then(() => page.waitForChanges())
+    .finally(() => {
+      clearInterval(interval)
+      clearTimeout(timeout)
+    })
 }
 
 type MethodsToMockByModule = Record<string, string[]>
