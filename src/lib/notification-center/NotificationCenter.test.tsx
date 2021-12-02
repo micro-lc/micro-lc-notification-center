@@ -6,7 +6,7 @@ import {genNotifications} from '../utils/test.utils'
 import NotificationCenter from './NotificationCenter'
 
 describe('NotificationCenter tests', () => {
-  it('should render', async () => {
+  it.skip('should render', async () => {
     const notifications = genNotifications(1)
     // @ts-ignore
     const {getByRole, getAllByRole} = render(<NotificationCenter notifications={notifications}/>)

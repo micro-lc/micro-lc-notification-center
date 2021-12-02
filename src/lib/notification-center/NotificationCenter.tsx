@@ -40,7 +40,9 @@ const defaultTranslations: DefaultTranslations = {
   loadingButton: 'Load More', 
   dateFormat: 'YYYY-MM-DD',
   noNotification: 'No notification to show',
-  errorMessage: 'An error occurred, try again'
+  errorMessage: 'An error occurred, try again',
+  readAll: 'Mark all as read',
+  reload: 'Reload'
 }
 
 type PopoverContainerProps = {
@@ -70,8 +72,9 @@ function NotificationCenter ({
     <I18n.Provider value={{defaultTranslations, locales}}>
       <style>{parseCssVariable([styles, antd])}</style>
       <PopoverContainer id={containerId} />
-      <Popover
-        arrowPointAtCenter 
+      <Popover 
+        arrowPointAtCenter
+        className='popover-content-container' 
         content={ 
           <NotificationsList 
             done={done} 

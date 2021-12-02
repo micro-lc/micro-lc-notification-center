@@ -55,12 +55,12 @@ class AllNotifications {
     })
   }
   patchAll (readState) {
-    this.notifications.forEach((el, i, arr) => {
-      arr[i].readState = readState
+    this.notifications = this.notifications.map((el) => {
+      return {...el, readState}
     })
   }
 }
 
-const notifications = new AllNotifications(9, 2)
+const notifications = new AllNotifications(190, 120)
 
 module.exports = {notifications}

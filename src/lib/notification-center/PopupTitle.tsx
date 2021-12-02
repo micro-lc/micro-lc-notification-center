@@ -1,9 +1,10 @@
 import React, {ReactElement, Fragment} from 'react'
 
-import {ReloadOutlined} from '@ant-design/icons'
-import {Row, Col, Button} from 'antd'
+import {Row, Col, Typography} from 'antd'
 
 import {useLocale} from '../utils/i18n.utils'
+
+const {Title, Text} = Typography
 
 export type PopupTitleProps = {
     loading?: boolean
@@ -15,26 +16,25 @@ export default function PopupTitle (props: PopupTitleProps) : ReactElement {
   const {t} = useLocale()
   return (
     <Fragment>
+    <Row>
+      <Col>
+        <Title className='notification-header' ellipsis={true} level={4} style={{marginBottom: '0px'}}>{t('title')}</Title>
+      </Col>
+    </Row>
     <Row justify='space-between'>
-      <Col span={16}>
-        <h2 className='notification-header'>{t('title')}</h2>
-      </Col>
-      <Col span={3}>
-        <Button 
-          icon={<ReloadOutlined />} 
-          loading={props.loading} 
+      <Col span={8}>
+        <Text 
+          className='notification-button'
+          disabled={props.loading} 
           onClick={props.reload} 
-          shape='circle' 
-          type='text' 
-        />
+        >{t('reload')}</Text>
       </Col>
-      <Col span={5}>
-        <Button 
-            loading={props.loading} 
-            onClick={props.onClickAll} 
-            shape='circle'  
-            type='text' 
-        >{'Read all'}</Button>
+      <Col span={16} style={{textAlign: 'end'}}>
+        <Text 
+          className='notification-button'
+          disabled={props.loading} 
+          onClick={props.onClickAll}  
+        >{t('readAll')}</Text>
       </Col>
     </Row>
     </Fragment>

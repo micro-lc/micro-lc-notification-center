@@ -1,6 +1,6 @@
-import React, {ReactElement, Fragment} from 'react'
+import React, {ReactElement} from 'react'
 
-import {Button, Typography} from 'antd'
+import {Typography} from 'antd'
 
 import {useLocale} from '../utils/i18n.utils'
 import {NotificationCenterProps} from './NotificationCenter'
@@ -21,7 +21,7 @@ export default function NotificationsList ({
   const {t} = useLocale()
 
   return (
-    <Fragment>
+    <div className='notification-container'>
       {error && <Text type='danger'>{t('errorMessage')}</Text>}
       {
         notifications.map((notification, i) => (
@@ -34,10 +34,10 @@ export default function NotificationsList ({
       }
       {
         !done &&
-          <div style={{textAlign: 'center'}}>
-            <Button loading={loading} onClick={next} type='primary'>{t('loadingButton')}</Button>
+          <div style={{textAlign: 'center', marginBottom: '5px'}}>
+            <Text className='notification-button' disabled={loading} onClick={next} style={{marginBottom: '5px !important'}} >{t('loadingButton')}</Text>
           </div>
       }
-    </Fragment>
+    </div>
   )
 }
