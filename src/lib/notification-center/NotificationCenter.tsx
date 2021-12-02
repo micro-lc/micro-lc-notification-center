@@ -1,4 +1,4 @@
-import React, {ReactElement} from 'react'
+import React, {ReactElement, useMemo} from 'react'
 
 import {BellOutlined} from '@ant-design/icons'
 import {Button, Popover} from 'antd'
@@ -43,6 +43,16 @@ const defaultTranslations: DefaultTranslations = {
   errorMessage: 'An error occurred, try again'
 }
 
+type PopoverContainerProps = {
+  id: string
+}
+
+function PopoverContainer ({id}: PopoverContainerProps) {
+  return (
+    <div id={id}></div>
+  )
+}
+
 function NotificationCenter ({
   notifications, 
   loading, 
@@ -54,12 +64,14 @@ function NotificationCenter ({
   onClick,
   onClickAll
 }: NotificationCenterProps): ReactElement {
+  const containerId = useMemo(() => `micro-lc-notification-center-${Math.random().toString(36)}`, [])
 
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
       <style>{parseCssVariable([styles, antd])}</style>
-      <Popover 
-        arrowPointAtCenter
+      <PopoverContainer id={containerId} />
+      <Popover
+        arrowPointAtCenter 
         content={ 
           <NotificationsList 
             done={done} 
@@ -70,6 +82,7 @@ function NotificationCenter ({
             onClick={onClick}
           />
         }
+        getPopupContainer={() => document.getElementById(containerId)}
         placement='bottomRight' 
         title={<PopupTitle loading={loading} onClickAll={onClickAll} reload={reload} />} 
         trigger='click'

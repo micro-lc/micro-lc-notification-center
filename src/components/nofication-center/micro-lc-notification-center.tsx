@@ -86,7 +86,8 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
   /**
    * Component fields
    */
-  loadNotifications = (reload?: boolean) => loadNotifications.bind(this)(reload)
+  next = loadNotifications.bind(this, false)
+  reload = loadNotifications.bind(this, true)
   onClick = onClick.bind(this)
   onClickAll = onClickAll.bind(this)
 
@@ -98,8 +99,8 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
     return {
       loading: this.loading, 
       notifications: this.notifications,
-      next: this.loadNotifications,
-      reload: () => this.loadNotifications(true),
+      next: this.next,
+      reload: this.reload,
       locales: this.locales,
       error: this.error,
       done: this.done,
@@ -124,7 +125,7 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
      * If the component is disconnected and re-connected this 
      * step is not needed since it memory content is not erased
      */
-    this.loadNotifications(true)
+    this.next()
   }
   
   disconnectedCallback() {
