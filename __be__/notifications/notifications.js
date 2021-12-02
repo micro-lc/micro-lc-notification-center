@@ -61,6 +61,6 @@ class AllNotifications {
   }
 }
 
-const notifications = new AllNotifications(190, 120)
+const notifications = new AllNotifications(20, 8)
 
 module.exports = {notifications}

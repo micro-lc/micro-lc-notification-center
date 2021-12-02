@@ -22,15 +22,16 @@ export default function NotificationsList ({
 
   return (
     <div className='notification-container'>
-      {error && <Text type='danger'>{t('errorMessage')}</Text>}
-      {
+      {error && <Text className='display-message' type='danger'>{t('errorMessage')}</Text>}
+      {notifications.length > 0 ?
         notifications.map((notification, i) => (
           <NotificationEntry
             key={i} 
             onClick={() => onClick(notification, i)}
             {...notification}
           />
-        ))
+        ))      :
+      <Text className='display-message'>{t('noNotification')}</Text>
       }
       {
         !done &&

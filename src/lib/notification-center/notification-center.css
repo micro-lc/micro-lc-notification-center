@@ -101,3 +101,8 @@
 .notification-item:hover {
   background-color: var(--ant-primary-1);
 }
+
+.display-message {
+  display: block !important;
+  padding: 10px !important;
+}
