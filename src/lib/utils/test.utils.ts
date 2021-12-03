@@ -28,7 +28,8 @@ const genNotifications = (quantity: number) => Array(quantity).fill(0).map(() =>
   _id: genId(),
   creatorId: genId(),
   createdAt: randomDate(),
-  title: randomString()
+  title: randomString(),
+  readState: false
 }))
 
 export {genNotifications, randomString}

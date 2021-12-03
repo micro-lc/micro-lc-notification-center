@@ -24,7 +24,7 @@ export default function NotificationEntry ({title, createdAt, readState, onClick
           <Text className='notification-date'>{dayjs(createdAt).locale(lang).format(t('dateFormat'))}</Text>
         </Col>
         <Col span={2}>
-          {readState === true ? <Fragment/> : <Badge className='notification-badge' color='magenta'/>}
+          {readState === true ? <Fragment/> : <Badge className='notification-badge' color=''/>}
         </Col>
       </Row>
       <Divider style={{margin: '5px 0px'}}/>

@@ -16,7 +16,7 @@ function randomDate(start = startFrom, end = today) {
 
 function randomString(length = 10) {
   let result = ''
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '
   const charactersLength = characters.length
   for ( var i = 0; i < length; i++ ) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength))
@@ -28,7 +28,7 @@ const mockNotifications = (quantity) => Array(quantity).fill(0).map(() => ({
   _id: genId(),
   creatorId: genId(),
   createdAt: randomDate(),
-  title: randomString()
+  title: randomString(120)
 }))
 
 const oldestFirst = (a, b) => (a < b) ? -1 : ((a > b) ? 1 : 0)

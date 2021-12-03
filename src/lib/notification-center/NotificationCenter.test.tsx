@@ -85,4 +85,34 @@ describe('NotificationCenter tests', () => {
       })
     })
   })
+
+  // TODO click on reload, load more, mark as read. 
+  // TODO
+  it.skip('should display badge for unread notification', async () => {
+    const notifications = genNotifications(3)
+    notifications[0].readState = true
+    // @ts-ignore
+    const {getByRole, getByTestId} = render(<NotificationCenter notifications={notifications}/>)
+    const button = getByRole(/button/i)
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      const firstNotification = getByTestId('notification-0')
+      fireEvent.click(firstNotification)
+    })
+  })
+
+  // TODO
+  it.skip('click on a notification should mark it as read', async () => {
+    const notifications = genNotifications(3)
+    // @ts-ignore
+    const {getByRole, getByTestId} = render(<NotificationCenter notifications={notifications}/>)
+    const button = getByRole(/button/i)
+    fireEvent.click(button)
+
+    await waitFor(() => {
+      const firstNotification = getByTestId('notification-0')
+      fireEvent.click(firstNotification)
+    })
+  })
 })
