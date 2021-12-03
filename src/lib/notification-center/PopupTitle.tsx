@@ -23,19 +23,19 @@ export default function PopupTitle (props: PopupTitleProps) : ReactElement {
     </Row>
     <Row justify='space-between'>
       <Col span={8}>
-        <Text 
+        <Text
           className='notification-button'
-          disabled={props.loading} 
+          disabled={props.loading}
           ellipsis={true}
-          onClick={props.reload} 
+          onClick={props.reload}
         >{t('reload')}</Text>
       </Col>
       <Col span={16} style={{textAlign: 'end'}}>
-        <Text 
+        <Text
           className='notification-button'
           disabled={props.loading}
-          ellipsis={true} 
-          onClick={props.onClickAll}  
+          ellipsis={true}
+          onClick={props.onClickAll}
         >{t('readAll')}</Text>
       </Col>
     </Row>

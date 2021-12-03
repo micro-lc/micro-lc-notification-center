@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const {notifications} = require('../../notifications')
 
 module.exports = (request, response) => {

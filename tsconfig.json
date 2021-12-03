@@ -1,13 +1,16 @@
 {
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "declaration": false,
     "experimentalDecorators": true,
     "lib": [
       "dom",
-      "es2017"
+      "esnext"
     ],
+    "strictBindCallApply": true,
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2017",

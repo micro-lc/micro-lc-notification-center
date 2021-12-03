@@ -5,8 +5,8 @@ describe('css utils tests', () => {
     const root = setCssVariables('#fff')
     expect(root).toContain(':host{')
     expect(root).toContain('--ant-primary-color: #fff;')
-    Array(7).fill(0).map((_, i) => {
-      expect(root).toContain(`--ant-primary-${i+1}:`)
+    Array(7).fill(0).forEach((_, i) => {
+      expect(root).toContain(`--ant-primary-${i + 1}:`)
     })
   })
 

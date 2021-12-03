@@ -1,10 +1,10 @@
 import {renderHook} from '@testing-library/react-hooks'
 
-import {defaultTranslations} from '../../notification-center/NotificationCenter';
+import {defaultTranslations} from '../../notification-center/NotificationCenter'
 import {I18n, useLocale} from '../i18n.utils'
 
 const init = (lang = 'en') => {
-  Object.defineProperty(window.navigator, 'language', {writable: true, value: lang});
+  Object.defineProperty(window.navigator, 'language', {writable: true, value: lang})
 }
 
 describe('i18n tests', () => {
@@ -19,16 +19,18 @@ describe('i18n tests', () => {
     const initLang = 'it'
     init(initLang)
     const {result: {current: {t, lang}}} = renderHook(() => useLocale(), {
-      wrapper: I18n.Provider, 
-      initialProps: {value: {
-        defaultTranslations,
-        locales: {
-          title: {
-            'it': 'Notifiche'
-          },
-          loadingButton: 'Load'
-        }        
-      }}
+      wrapper: I18n.Provider,
+      initialProps: {
+        value: {
+          defaultTranslations,
+          locales: {
+            title: {
+              it: 'Notifiche'
+            },
+            loadingButton: 'Load'
+          }
+        }
+      }
     })
     expect(lang).toBe(initLang)
     expect(t('title')).toStrictEqual('Notifiche')
@@ -41,15 +43,17 @@ describe('i18n tests', () => {
     const initLang = 'it-IT'
     init(initLang)
     const {result: {current: {t}}} = renderHook(() => useLocale(), {
-      wrapper: I18n.Provider, 
-      initialProps: {value: {
-        defaultTranslations,
-        locales: {
-          title: {
-            'it': 'Notifiche'
+      wrapper: I18n.Provider,
+      initialProps: {
+        value: {
+          defaultTranslations,
+          locales: {
+            title: {
+              it: 'Notifiche'
+            }
           }
-        }        
-      }}
+        }
+      }
     })
     expect(t('title')).toStrictEqual('Notifiche')
   })
@@ -58,33 +62,37 @@ describe('i18n tests', () => {
     const initLang = 'de'
     init(initLang)
     const {result: {current: {t}}} = renderHook(() => useLocale(), {
-      wrapper: I18n.Provider, 
-      initialProps: {value: {
-        defaultTranslations,
-        locales: {
-          title: {
-            'it': 'Notifiche'
+      wrapper: I18n.Provider,
+      initialProps: {
+        value: {
+          defaultTranslations,
+          locales: {
+            title: {
+              it: 'Notifiche'
+            }
           }
-        }        
-      }}
+        }
+      }
     })
     expect(t('title')).toStrictEqual('Notifications')
   })
 
   it('should default lang on undefined browser context', () => {
-    Object.defineProperty(window.navigator, 'language', {writable: true, value: undefined});
+    Object.defineProperty(window.navigator, 'language', {writable: true, value: undefined})
 
     const {result: {current: {t}}} = renderHook(() => useLocale(), {
-      wrapper: I18n.Provider, 
-      initialProps: {value: {
-        defaultTranslations,
-        locales: {
-          title: {
-            'en': 'given string',
-            'it': 'Notifiche'
+      wrapper: I18n.Provider,
+      initialProps: {
+        value: {
+          defaultTranslations,
+          locales: {
+            title: {
+              en: 'given string',
+              it: 'Notifiche'
+            }
           }
-        }        
-      }}
+        }
+      }
     })
     expect(t('title')).toStrictEqual('given string')
   })

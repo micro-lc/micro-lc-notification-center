@@ -86,7 +86,7 @@ describe('NotificationCenter tests', () => {
     })
   })
 
-  // TODO click on reload, load more, mark as read. 
+  // TODO click on reload, load more, mark as read.
   // TODO
   it.skip('should display badge for unread notification', async () => {
     const notifications = genNotifications(3)

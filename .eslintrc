@@ -10,12 +10,19 @@
       "version": "detect"
     }
   },
-  "plugins": ["standard", "@typescript-eslint", "react", "import"],
+  "extends": [
+    "react-app",
+    "standard",
+    "standard-react",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "plugins": ["@typescript-eslint", "react-hooks", "jsx-a11y"],
   "rules": {
     "react/prop-types": "off",
     "no-console": 2,
     "no-use-before-define": "off",
-    "quotes": ["error", "single"],
     "@typescript-eslint/no-use-before-define": ["error"],
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-empty-function": "off",

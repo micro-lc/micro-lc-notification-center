@@ -8,21 +8,21 @@ const startFrom = new Date(today.getTime())
 startFrom.setTime(today.getTime() - START_DAYS_AGO * 24 * 60 * 60 * 1000)
 
 function genId () {
-    const timestamp = (new Date().getTime() / 1000 | 0).toString(16)
-    return timestamp + 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function () {
-      return (Math.random() * 16 | 0).toString(16);
-    }).toLowerCase()
+  const timestamp = (new Date().getTime() / 1000 | 0).toString(16)
+  return timestamp + 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function () {
+    return (Math.random() * 16 | 0).toString(16)
+  }).toLowerCase()
 }
 
-function randomDate(start = startFrom, end = today): string {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString();
+function randomDate (start = startFrom, end = today): string {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime())).toISOString()
 }
 
-function randomString(length = 10) {
+function randomString (length = 10) {
   let result = ''
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   const charactersLength = characters.length
-  for ( var i = 0; i < length; i++ ) {
+  for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength))
   }
   return result
@@ -40,15 +40,16 @@ const oldestFirst = (a: string, b: string) => (a < b) ? -1 : ((a > b) ? 1 : 0)
 
 class AllNotifications {
   notifications: Notification[]
-  constructor(quantity: number, unread: number) {
+  constructor (quantity: number, unread: number) {
     this.notifications = mockNotifications(quantity)
     this.notifications.sort(({createdAt: a}, {createdAt: b}) => -oldestFirst(a, b))
     this.notifications.forEach((_, i, arr) => {
-      if(i >= unread) {
+      if (i >= unread) {
         arr[i].readState = true
       }
     })
   }
+
   slice (start?: number, end?: number): Notification[] {
     return this.notifications.slice(start, end)
   }
@@ -59,10 +60,10 @@ type WaitForOptions = {
 }
 
 async function waitForChanges<T = any> (page: SpecPage, callback?: () => T, opts: WaitForOptions = {timeout: 3000}): Promise<T> {
-  let reason: any = undefined
+  let reason: any
   let outsideResolve: (value: T | PromiseLike<T>) => void
   let outsideReject: (reason?: any) => void
-  let promise = new Promise<T>((resolve, reject) => {
+  const promise = new Promise<T>((resolve, reject) => {
     outsideResolve = resolve
     outsideReject = reject
   })
@@ -147,6 +148,5 @@ export default class Sandbox {
     this.actuals = {}
   }
 }
-
 
 export {mockNotifications, waitForChanges, Sandbox, AllNotifications}

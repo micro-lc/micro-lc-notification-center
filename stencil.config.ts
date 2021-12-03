@@ -15,17 +15,17 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'dist',
-      esmLoaderPath: '../loader',
+      esmLoaderPath: '../loader'
     },
     {
       type: 'www',
-      copy: [{'src': 'assets', warn: true}],
-      serviceWorker: null,
-    },
+      copy: [{src: 'assets', warn: true}],
+      serviceWorker: null
+    }
   ],
   testing: {
     roots: ['src'],
-    moduleNameMapper:{
+    moduleNameMapper: {
       '\\.css$': 'identity-obj-proxy'
     },
     testPathIgnorePatterns: ['/node_modules/', '/src/lib/'],

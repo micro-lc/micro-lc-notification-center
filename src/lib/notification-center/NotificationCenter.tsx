@@ -10,7 +10,6 @@ import styles from './notification-center.css'
 import NotificationsList from './NotificationsList'
 import PopupTitle from './PopupTitle'
 
-
 type ReadStateHandler = (notification: Notification, index: number) => Promise<void>
 
 type AllReadStateHandler = () => Promise<number>
@@ -33,11 +32,13 @@ export type NotificationCenterProps = {
   done: boolean
   onClick: ReadStateHandler
   onClickAll: AllReadStateHandler
+  count?: number
+  unread?: number
 }
 
 const defaultTranslations: DefaultTranslations = {
-  title: 'Notifications', 
-  loadingButton: 'Load More', 
+  title: 'Notifications',
+  loadingButton: 'Load More',
   dateFormat: 'YYYY-MM-DD',
   noNotification: 'No notification to show',
   errorMessage: 'An error occurred, try again',
@@ -56,10 +57,10 @@ function PopoverContainer ({id}: PopoverContainerProps) {
 }
 
 function NotificationCenter ({
-  notifications, 
-  loading, 
-  locales, 
-  reload, 
+  notifications,
+  loading,
+  locales,
+  reload,
   next,
   error,
   done,
@@ -72,12 +73,12 @@ function NotificationCenter ({
     <I18n.Provider value={{defaultTranslations, locales}}>
       <style>{parseCssVariable([styles, antd])}</style>
       <PopoverContainer id={containerId} />
-      <Popover 
+      <Popover
         arrowPointAtCenter
-        className='popover-content-container' 
-        content={ 
-          <NotificationsList 
-            done={done} 
+        className='popover-content-container'
+        content={
+          <NotificationsList
+            done={done}
             error={error}
             loading={loading}
             next={next}
@@ -86,13 +87,13 @@ function NotificationCenter ({
           />
         }
         getPopupContainer={() => document.getElementById(containerId)}
-        placement='bottomRight' 
-        title={<PopupTitle loading={loading} onClickAll={onClickAll} reload={reload} />} 
+        placement='bottomRight'
+        title={<PopupTitle loading={loading} onClickAll={onClickAll} reload={reload} />}
         trigger='click'
       >
-        <Button 
-          shape='circle' 
-          style={{color: 'white', padding: 'initial'}} 
+        <Button
+          shape='circle'
+          style={{color: 'white', padding: 'initial'}}
           type='primary'
         >
           <BellOutlined />

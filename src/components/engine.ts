@@ -1,8 +1,10 @@
 import React from 'react'
 
+import {h, Host, VNode} from '@stencil/core'
 import ReactDOM from 'react-dom'
 
 import {setCssVariables} from '../utils/shadowRootCSS'
+import {MicroLcNotificationCenter} from './nofication-center/micro-lc-notification-center'
 
 export interface Creatable<P = Record<string, never>> {
   wasDetached: boolean
@@ -13,14 +15,14 @@ export interface Creatable<P = Record<string, never>> {
   unmount(): boolean
 }
 
-function reactRender<P, T extends Creatable<P>>(this: T, conditionalRender = true): void {
+function reactRender<P, T extends Creatable<P>> (this: T, conditionalRender = true): void {
   conditionalRender && ReactDOM.render(
-    React.createElement.bind(this, this.Component, this.create())(), 
+    React.createElement.bind(this, this.Component, this.create())(),
     this.element
   )
 }
 
-function unmountComponentAtNode<P, T extends Creatable<P>>(this: T): boolean {
+function unmountComponentAtNode<P, T extends Creatable<P>> (this: T): boolean {
   this.wasDetached = true
   return ReactDOM.unmountComponentAtNode(this.element)
 }
@@ -38,4 +40,14 @@ function shadowRootCSS<P, T extends Creatable<P>> (this: T, id?: string): void {
   this.element.shadowRoot.appendChild(style)
 }
 
-export {reactRender, unmountComponentAtNode, shadowRootCSS}
+function render (this: MicroLcNotificationCenter): VNode {
+  const host = h(Host, null, h('slot'))
+  this.rerender()
+  return host
+}
+
+function disconnectedCallback (this: MicroLcNotificationCenter): void {
+  this.unmount()
+}
+
+export {render, disconnectedCallback, reactRender, unmountComponentAtNode, shadowRootCSS}

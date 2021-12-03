@@ -1,19 +1,26 @@
 import axios, {AxiosResponse} from 'axios'
 
 import {MicroLcNotificationCenter} from '../components/nofication-center/micro-lc-notification-center'
+import {Notification} from '../lib'
 
 export type ReadStateRequestBody = {
   readState: boolean
 }
 
+export type Counters = {
+  count: number
+  unread: number
+}
+
 export enum Routes {
   Fetch = '/own',
   SetRead = '/read-state',
+  Count = '/own/count'
 }
 
 const DEFAULT_PAGINATION_LIMIT = 10
 
-async function getNotifications(this: MicroLcNotificationCenter, skip: number): Promise<Notification[]> {
+async function getNotifications (this: MicroLcNotificationCenter, skip: number): Promise<Notification[]> {
   const {data} = await axios.get<Notification[]>(`${this.endpoint}${Routes.Fetch}`, {
     headers: this.headers,
     params: {skip, limit: this.limit},
@@ -22,20 +29,24 @@ async function getNotifications(this: MicroLcNotificationCenter, skip: number): 
   return data
 }
 
-async function patchReadState(this: MicroLcNotificationCenter, _id: string, readState = true): Promise<void> {
-  if(!_id) {
+async function patchReadState (this: MicroLcNotificationCenter, _id: string, readState = true): Promise<void> {
+  if (!_id) {
     throw new Error('`_id` cannot be undefined or an empty string')
   }
 
   const route = `${Routes.SetRead}/${_id}`
   await axios.patch<void, AxiosResponse<void>, ReadStateRequestBody>(`${this.endpoint}${route}`, {readState}, {headers: this.headers})
-  return 
 }
 
-async function patchAllReadState(this: MicroLcNotificationCenter): Promise<number> {
+async function patchAllReadState (this: MicroLcNotificationCenter): Promise<number> {
   const route = `${Routes.SetRead}${Routes.Fetch}`
   const {data} = await axios.patch<number, AxiosResponse<number>, ReadStateRequestBody>(`${this.endpoint}${route}`, {readState: true}, {headers: this.headers})
   return data
-} 
+}
 
-export {getNotifications, patchReadState, patchAllReadState, DEFAULT_PAGINATION_LIMIT}
+async function getCounts (this: MicroLcNotificationCenter): Promise<Counters> {
+  const {data} = await axios.get<Counters>(`${this.endpoint}${Routes.Count}`, {headers: this.headers})
+  return data
+}
+
+export {getNotifications, patchReadState, patchAllReadState, getCounts, DEFAULT_PAGINATION_LIMIT}

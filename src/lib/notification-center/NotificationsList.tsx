@@ -26,11 +26,11 @@ export default function NotificationsList ({
       {notifications.length > 0 ?
         notifications.map((notification, i) => (
           <NotificationEntry
-            key={i} 
+            key={i}
             onClick={() => onClick(notification, i)}
             {...notification}
           />
-        ))      :
+        )) :
       <Text className='display-message'>{t('noNotification')}</Text>
       }
       {

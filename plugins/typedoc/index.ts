@@ -2,21 +2,21 @@
 import {Application, ProjectReflection, TSConfigReader, TypeDocReader} from 'typedoc'
 
 const parser = async (project: ProjectReflection) => {
-  console.log(project.getChildByName('<internal>').getChildByName('LocalizedString'))  
+  console.log(project.getChildByName('<internal>').getChildByName('LocalizedString'))
 }
 
 (async function () {
-    const app = new Application();
+  const app = new Application()
 
-    // If you want TypeDoc to load tsconfig.json / typedoc.json files
-    app.options.addReader(new TSConfigReader());
-    app.options.addReader(new TypeDocReader());
+  // If you want TypeDoc to load tsconfig.json / typedoc.json files
+  app.options.addReader(new TSConfigReader())
+  app.options.addReader(new TypeDocReader())
 
-    app.bootstrap();
+  app.bootstrap()
 
-    const project = app.convert();
+  const project = app.convert()
 
-    if (project) {
-      await parser(project)
-    }
-})().catch(console.error);
+  if (project) {
+    await parser(project)
+  }
+})().catch(console.error)

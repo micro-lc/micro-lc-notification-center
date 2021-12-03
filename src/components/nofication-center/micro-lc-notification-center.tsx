@@ -1,9 +1,9 @@
-import {h, Component, Host, Element, Prop, State} from '@stencil/core'
+import {Component, Element, Prop, State, VNode} from '@stencil/core'
 
 import {NotificationCenter, Notification, NotificationCenterProps} from '../../lib'
 import {PartialTranslations} from '../../lib/utils/i18n.utils'
 import {DEFAULT_PAGINATION_LIMIT} from '../../utils/notificationsClient'
-import {reactRender, unmountComponentAtNode, Creatable, shadowRootCSS} from '../engine'
+import {reactRender, unmountComponentAtNode, Creatable, shadowRootCSS, disconnectedCallback, render} from '../engine'
 import {loadNotifications, onClick, onClickAll} from './micro-lc-notification-center.lib'
 
 const DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT = '/api/v1/micro-lc-notification-center'
@@ -39,23 +39,23 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
    */
   @Prop() endpoint = DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT
   /**
-   * `limit` (optional) controls pagination limit 
-   * while fetching notifications. It is also an HTML 
+   * `limit` (optional) controls pagination limit
+   * while fetching notifications. It is also an HTML
    * attribute.
    */
   @Prop() limit = DEFAULT_PAGINATION_LIMIT
   /**
-   * `headers` (optional) is a key-value list of 
+   * `headers` (optional) is a key-value list of
    * http headers to attach to the http client that
    * fetches notifications
    */
   @Prop() headers: MicroLcHeaders = {}
   /**
-   * `locales` (optional) is a key-value list to 
+   * `locales` (optional) is a key-value list to
    * allow i18n support. Keys are paired to either a string,
    * which overrides language support or to a key-value map
    * that matches a language to a translation
-   * 
+   *
    * ```javascript
    * const locales = {
    *   title: 'A Title',
@@ -67,27 +67,30 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
    * ```
    */
   @Prop() locales: PartialTranslations = {}
-  
+
   @State() notifications: Notification[] = []
   @State() loading?: boolean
   @State() page: Pagination = {skip: 0}
   @State() error = false
   @State() done = false
+  @State() count?: number
+  @State() unread?: number
 
   /**
    * React fields
    */
   Component = NotificationCenter
   wasDetached = false
-  rerender = reactRender.bind(this)
-  unmount = unmountComponentAtNode.bind(this)
-  shadowRootCSS = shadowRootCSS.bind(this)
+  rerender = reactRender.bind<((conditionalRender?: boolean) => void)>(this)
+  unmount = unmountComponentAtNode.bind<(() => boolean)>(this)
+  shadowRootCSS = shadowRootCSS.bind<((id?: string) => void)>(this)
 
   /**
    * Component fields
    */
-  next = loadNotifications.bind(this, false)
-  reload = loadNotifications.bind(this, true)
+  private load = loadNotifications.bind<((reload?: boolean) => Promise<void>)>(this)
+  next = () => this.load(false)
+  reload = () => this.load(true)
   onClick = onClick.bind(this)
   onClickAll = onClickAll.bind(this)
 
@@ -95,23 +98,38 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
    * Bind `this` to match react element props
    * @returns react element props
    */
-  create(): NotificationCenterProps {
-    return {
-      loading: this.loading, 
+  create (): NotificationCenterProps {
+    const props: NotificationCenterProps = {
       notifications: this.notifications,
       next: this.next,
       reload: this.reload,
       locales: this.locales,
       error: this.error,
       done: this.done,
-      onClick: this.onClick, 
+      onClick: this.onClick,
       onClickAll: this.onClickAll
     }
+
+    if (this.loading !== undefined) {
+      props.loading = this.loading
+    }
+    if (this.count !== undefined) {
+      props.count = this.count
+    }
+    if (this.unread !== undefined) {
+      props.unread = this.unread
+    }
+
+    return props
   }
 
-  connectedCallback() {
+  /**
+   * webcomponents lifecycle
+   */
+
+  connectedCallback () {
     this.shadowRootCSS('micro-lc-notification-center-style')
-    /** 
+    /**
      * There's no need of rendering when attaching the component.
      * If the component is disconnected and then re-connected a single
      * re-render is needed in order to re-apply the shadowed React component within
@@ -119,22 +137,15 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
     this.rerender(this.wasDetached)
   }
 
-  componentWillLoad() {
+  componentWillLoad () {
     /**
      * Performs a notification refresh only on first render.
-     * If the component is disconnected and re-connected this 
+     * If the component is disconnected and re-connected this
      * step is not needed since it memory content is not erased
      */
     this.next()
   }
-  
-  disconnectedCallback() {
-    this.unmount()
-  }
 
-  render() {
-    const host = h(Host, null, h('slot'))
-    this.rerender()
-    return host
-  }
+  disconnectedCallback = disconnectedCallback.bind<(() => void)>(this)
+  render = render.bind<(() => VNode)>(this)
 }

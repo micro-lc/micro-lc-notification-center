@@ -11,6 +11,7 @@ import {MicroLcNotificationCenter} from './micro-lc-notification-center'
 const DEFAULT_NOCK_ENDPOINT = 'http://localhost'
 const NOTIFICATIONS = '/notifications'
 const NOTIFICATIONS_FETCH = `${NOTIFICATIONS}/own`
+const NOTIFICATIONS_FETCH_COUNT = `${NOTIFICATIONS}/own/count`
 const endpoint = `${DEFAULT_NOCK_ENDPOINT}${NOTIFICATIONS}`
 const mocks = {react: ['createElement'], 'react-dom': ['render', 'unmountComponentAtNode']}
 
@@ -18,8 +19,10 @@ const ALL = 99
 const UNREAD = 7
 const allNotifications = new AllNotifications(ALL, UNREAD)
 
+// jest.mock('../engine')
+
 /**
- * initializes a nock get mock to the first 
+ * initializes a nock get mock to the first
  * batch of paginated notifications if status is 'ok'
  * otherwise gives a 500 if 'nok'
  * @param status {'ok' | 'nok'} http response status
@@ -27,17 +30,30 @@ const allNotifications = new AllNotifications(ALL, UNREAD)
  * @param limit pagination limit to DEFAULT_PAGINATION_LIMIT (= 10)
  * @returns nock scope
  */
-function init (status: 'ok' | 'nok', skip = 0, limit = DEFAULT_PAGINATION_LIMIT): Notification[] | undefined {
-  const scope = nock(DEFAULT_NOCK_ENDPOINT)
+function init (status: 'ok' | 'nok' | 'count-nok' | 'disaster', skip = 0, limit = DEFAULT_PAGINATION_LIMIT): Notification[] | undefined {
+  const n = nock(DEFAULT_NOCK_ENDPOINT)
     .get(NOTIFICATIONS_FETCH)
     .query({skip, limit})
-  if(status === 'ok') {
+  const c = nock(DEFAULT_NOCK_ENDPOINT)
+    .get(NOTIFICATIONS_FETCH_COUNT)
+  if (status === 'ok') {
     const notifications = mockNotifications(limit)
-    scope.reply(200, notifications)
+    n.reply(200, notifications)
+    c.reply(200, {count: limit, unread: 0})
     return notifications
+  } else if (status === 'nok') {
+    n.reply(500)
+    c.reply(200, {count: limit, unread: 0})
+    return
+  } else if (status === 'count-nok') {
+    const notifications = mockNotifications(limit)
+    n.reply(200, notifications)
+    c.reply(500)
+    return
   }
 
-  scope.reply(500)
+  n.reply(500)
+  c.reply(500)
 }
 
 /**
@@ -60,7 +76,7 @@ function call<T = any, A extends any[] = any> ({mock: {calls}}: jest.Mock<T, A>,
 async function create (props: JSX.MicroLcNotificationCenter = {}): Promise<SpecPage> {
   return newSpecPage({
     components: [MicroLcNotificationCenter],
-    template: () => h('micro-lc-notification-center', props)//`<micro-lc-notification-center ${endpoint ?? ''}></micro-lc-notification-center>`
+    template: () => h('micro-lc-notification-center', props)// `<micro-lc-notification-center ${endpoint ?? ''}></micro-lc-notification-center>`
   })
 }
 
@@ -69,6 +85,9 @@ async function initStandard (): Promise<SpecPage> {
     .get(NOTIFICATIONS_FETCH)
     .query({skip: 0, limit: DEFAULT_PAGINATION_LIMIT})
     .reply(200, allNotifications.slice(0, DEFAULT_PAGINATION_LIMIT))
+  nock(DEFAULT_NOCK_ENDPOINT)
+    .get(NOTIFICATIONS_FETCH_COUNT)
+    .reply(200, {count: ALL, unread: UNREAD})
   const page = await create({endpoint})
 
   // await for first notifications batch
@@ -78,7 +97,6 @@ async function initStandard (): Promise<SpecPage> {
 
   return page
 }
-
 
 nock.disableNetConnect()
 
@@ -102,11 +120,14 @@ describe('micro-lc-notification-center lifecycle tests', () => {
       .get('/api/v1/micro-lc-notification-center/own')
       .query({skip: 0, limit: DEFAULT_PAGINATION_LIMIT})
       .reply(200, [])
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .get('/api/v1/micro-lc-notification-center/own/count')
+      .reply(200, {count: 0, unread: 0})
     const {react: {createElement}} = sandboxMocks
     const page = await create()
-    expect(call(createElement, 0)[1]).toMatchObject({
-      loading: true, 
-      notifications: [], 
+    expect(call(createElement)[1]).toMatchObject({
+      loading: true,
+      notifications: [],
       done: false
     })
 
@@ -114,10 +135,14 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 1)[1]).toMatchObject({
-      loading: false, 
-      notifications: [], 
-      done: true
+
+    // @ts-ignore
+    expect(call(createElement)[1]).toMatchObject({
+      loading: false,
+      notifications: [],
+      done: true,
+      count: 0,
+      unread: 0
     })
   })
 
@@ -127,11 +152,14 @@ describe('micro-lc-notification-center lifecycle tests', () => {
       .get('/api/v1/micro-lc-notification-center/own')
       .query({skip: 0, limit: 2})
       .reply(200, notifications)
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .get('/api/v1/micro-lc-notification-center/own/count')
+      .reply(200, {count: 1, unread: 0})
     const {react: {createElement}} = sandboxMocks
     const page = await create({limit: 2})
-    expect(call(createElement, 0)[1]).toMatchObject({
-      loading: true, 
-      notifications: [], 
+    expect(call(createElement)[1]).toMatchObject({
+      loading: true,
+      notifications: [],
       done: false
     })
 
@@ -139,9 +167,11 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 1)[1]).toMatchObject({
-      loading: false, 
-      notifications, 
+    expect(call(createElement)[1]).toMatchObject({
+      count: 1,
+      unread: 0,
+      loading: false,
+      notifications,
       done: true
     })
   })
@@ -151,13 +181,13 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     const {react: {createElement}, 'react-dom': {unmountComponentAtNode, render}} = sandboxMocks
     const notifications = init('ok')
     const page = await create({endpoint})
-    expect(call(createElement, 0)[1]).toMatchObject({loading: true, notifications: []})
+    expect(call(createElement)[1]).toMatchObject({loading: true, notifications: []})
 
     // await for fetching and check the response
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 1)[1]).toMatchObject({loading: false, notifications})
+    expect(call(createElement)[1]).toMatchObject({loading: false, notifications})
 
     // pick the host (which is root), remove it from the body
     // and check the react component is unmounted
@@ -179,13 +209,13 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     init('nok')
     const {react: {createElement}} = sandboxMocks
     const page = await create({endpoint})
-    expect(call(createElement, 0)[1]).toMatchObject({loading: true, notifications: []})
+    expect(call(createElement)[1]).toMatchObject({loading: true, notifications: []})
 
     // on failed fetch the `error` flag is true
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 1)[1]).toMatchObject({loading: false, notifications: [], error: true})
+    expect(call(createElement)[1]).toMatchObject({loading: false, notifications: [], error: true})
   })
 
   it('should attempt double fetch, also setting a non-default limit', async () => {
@@ -194,7 +224,7 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     const {react: {createElement}} = sandboxMocks
     const p1 = init('ok', 0, limit)
     const page = await create({endpoint, limit})
-    const {next} = call(createElement, 0)[1]
+    const {next} = call(createElement)[1]
 
     // await for first notifications batch
     await waitForChanges(page, () => {
@@ -209,7 +239,7 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 2)[1]).toMatchObject({loading: false, notifications: [...p1, ...p2]})
+    expect(call(createElement)[1]).toMatchObject({loading: false, notifications: [...p1, ...p2]})
   })
 
   it('should attempt reload after successful fetch', async () => {
@@ -232,7 +262,7 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 2)[1]).toMatchObject({loading: false, notifications: p1})
+    expect(call(createElement)[1]).toMatchObject({loading: false, notifications: p1})
   })
 
   it('should attempt reload after failed fetch', async () => {
@@ -240,7 +270,7 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     init('nok')
     const {react: {createElement}} = sandboxMocks
     const page = await create({endpoint})
-    const {reload} = call(createElement, 0)[1]
+    const {reload} = call(createElement)[1]
 
     // wait for http request failure
     await waitForChanges(page, () => {
@@ -255,7 +285,7 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 2)[1]).toMatchObject({loading: false, notifications: p1, error: false})
+    expect(call(createElement)[1]).toMatchObject({loading: false, notifications: p1, error: false})
   })
 
   it('should attempt reload after 2 pages', async () => {
@@ -284,7 +314,7 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     await waitForChanges(page, () => {
       expect(nock.isDone()).toBe(true)
     })
-    expect(call(createElement, 3)[1]).toMatchObject({loading: false, notifications: p1})
+    expect(call(createElement)[1]).toMatchObject({loading: false, notifications: p1})
   })
 
   it('should notify some unread notifications', async () => {

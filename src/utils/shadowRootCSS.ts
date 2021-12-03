@@ -21,12 +21,12 @@ const setCssVariables = (primary: string, key = 'host') => {
   const palette = generate(primary)
   const prim = `${ANT_VAR_PREFIX}-primary-color: ${primary};`
   const colors = palette.slice(0, 7).map((color, index) =>
-    `${ANT_VAR_PREFIX}-primary-${index+1}: ${color};`
+    `${ANT_VAR_PREFIX}-primary-${index + 1}: ${color};`
   )
   const hover = `${ANT_VAR_PREFIX}-primary-color-hover: ${palette[4]};`
   const active = `${ANT_VAR_PREFIX}-primary-color-active: ${palette[6]};`
   const outline = `${ANT_VAR_PREFIX}-primary-color-outline: ${primary}33`
-  
+
   return `:${key}{${[prim, ...colors, hover, active, outline].filter(Boolean).join('')}}`
 }
 
