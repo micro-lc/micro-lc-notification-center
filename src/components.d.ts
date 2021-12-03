@@ -14,15 +14,15 @@ export namespace Components {
          */
         "endpoint": string;
         /**
-          * `headers` (optional) is a key-value list of  http headers to attach to the http client that fetches notifications
+          * `headers` (optional) is a key-value list of http headers to attach to the http client that fetches notifications
          */
         "headers": MicroLcHeaders;
         /**
-          * `limit` (optional) controls pagination limit  while fetching notifications. It is also an HTML  attribute.
+          * `limit` (optional) controls pagination limit while fetching notifications. It is also an HTML attribute.
          */
         "limit": number;
         /**
-          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
+          * `locales` (optional) is a key-value list to allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
          */
         "locales": PartialTranslations;
     }
@@ -45,15 +45,15 @@ declare namespace LocalJSX {
          */
         "endpoint"?: string;
         /**
-          * `headers` (optional) is a key-value list of  http headers to attach to the http client that fetches notifications
+          * `headers` (optional) is a key-value list of http headers to attach to the http client that fetches notifications
          */
         "headers"?: MicroLcHeaders;
         /**
-          * `limit` (optional) controls pagination limit  while fetching notifications. It is also an HTML  attribute.
+          * `limit` (optional) controls pagination limit while fetching notifications. It is also an HTML attribute.
          */
         "limit"?: number;
         /**
-          * `locales` (optional) is a key-value list to  allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
+          * `locales` (optional) is a key-value list to allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
          */
         "locales"?: PartialTranslations;
     }

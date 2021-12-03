@@ -146,6 +146,11 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
     this.next()
   }
 
-  disconnectedCallback = disconnectedCallback.bind<(() => void)>(this)
-  render = render.bind<(() => VNode)>(this)
+  disconnectedCallback () {
+    return disconnectedCallback.bind<(() => void)>(this)()
+  }
+
+  render () {
+    return render.bind<(() => VNode)>(this)()
+  }
 }
