@@ -3,8 +3,6 @@ import analyze from 'rollup-plugin-analyzer'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
 
 export const config: Config = {
-  minifyJs: true,
-  enableCache: true,
   rollupPlugins: {
     after: [
       analyze({summaryOnly: true, limit: 5}),
@@ -37,10 +35,10 @@ export const config: Config = {
     ],
     coverageThreshold: {
       global: {
-        statements: 80,
+        statements: 95,
         branches: 80,
-        functions: 80,
-        lines: 80
+        functions: 95,
+        lines: 95
       }
     },
     coverageReporters: [

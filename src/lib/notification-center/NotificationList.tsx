@@ -18,32 +18,29 @@ export default function NotificationsList ({
   next,
   notifications
 }: NotificationsListProps) : ReactElement {
+  const {t} = useLocale()
+
   const containerId = useMemo(() => `micro-lc-notification-center-${Math.random().toString(36)}`, [])
   const handleBackOnTop = useCallback(() => { document.getElementById(containerId).scrollTo(0, 0) }, [containerId])
-  const {t} = useLocale()
+  const renderFooter = useCallback(() => done ?
+    <Text className='notification-button' disabled={loading} onClick={handleBackOnTop} style={{marginBottom: '5px !important'}} >{t('backOnTop')}</Text> :
+    <Text className='notification-button' disabled={loading} onClick={next} style={{marginBottom: '5px !important'}} >{t('loadingButton')}</Text>
+  , [done, handleBackOnTop, loading, next, t])
 
   return (
     <div className='notification-container' data-testid='notifications-container' id={containerId}>
       {error && <Text className='display-message' type='danger'>{t('errorMessage')}</Text>}
-      {notifications.length > 0 ?
-        notifications.map((notification, i) => (
+      {notifications.map((notification, i) => (
           <NotificationEntry
             key={i}
             onClick={() => onClick(notification, i)}
             {...notification}
           />
-        )) :
-      <Text className='display-message'>{t('noNotification')}</Text>
-      }
-      {
-        !done ?
-          <div role='button' style={{textAlign: 'center', marginBottom: '5px'}} tabIndex={0}>
-            <Text className='notification-button' disabled={loading} onClick={next} style={{marginBottom: '5px !important'}} >{t('loadingButton')}</Text>
-          </div> :
-          <div role='button' style={{textAlign: 'center', marginBottom: '5px'}} tabIndex={0}>
-            <Text className='notification-button' disabled={loading} onClick={handleBackOnTop} style={{marginBottom: '5px !important'}} >{t('backOnTop')}</Text>
-          </div>
-      }
+      ))}
+      {notifications.length === 0 && <Text className='display-message'>{t('noNotification')}</Text>}
+      <div role='button' style={{textAlign: 'center', marginBottom: '5px'}} tabIndex={0}>
+        {renderFooter()}
+      </div>
     </div>
   )
 }

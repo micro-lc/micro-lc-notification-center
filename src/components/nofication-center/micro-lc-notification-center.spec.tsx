@@ -136,7 +136,6 @@ describe('micro-lc-notification-center lifecycle tests', () => {
       expect(nock.isDone()).toBe(true)
     })
 
-    // @ts-ignore
     expect(call(createElement)[1]).toMatchObject({
       loading: false,
       notifications: [],
@@ -371,5 +370,23 @@ describe('micro-lc-notification-center lifecycle tests', () => {
       expect(nock.isDone()).toBe(true)
       expect(number).toStrictEqual(10)
     })
+  })
+
+  it('should set done to true when notifications retrieved match the count', async () => {
+    const {react: {createElement}} = sandboxMocks
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .get(NOTIFICATIONS_FETCH)
+      .query({skip: 0, limit: DEFAULT_PAGINATION_LIMIT})
+      .reply(200, allNotifications.slice(0, DEFAULT_PAGINATION_LIMIT))
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .get(NOTIFICATIONS_FETCH_COUNT)
+      .reply(200, {count: DEFAULT_PAGINATION_LIMIT, unread: 0})
+    const page = await create({endpoint})
+
+    await waitForChanges(page, () => {
+      expect(nock.isDone()).toBe(true)
+    })
+    const {done} = call(createElement)[1]
+    expect(done).toBe(true)
   })
 })
