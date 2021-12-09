@@ -46,6 +46,7 @@ export const config: Config = {
     coverageReporters: [
       'text',
       'lcov'
-    ]
+    ],
+    coverageDirectory: 'coverage/webcomponents'
   }
 }

@@ -32,7 +32,8 @@
     "test": "yarn test:react && yarn test:stencil",
     "coverage:react": "yarn test:react --coverage",
     "coverage:stencil": "yarn run test:stencil --coverage",
-    "coverage": "yarn coverage:react && yarn coverage:stencil",
+    "coverage:merge": "lcov-result-merger \"./coverage/*/lcov.info\" \"./coverage/lcov.info\"",
+    "coverage": "yarn coverage:react && yarn coverage:stencil && yarn coverage:merge",
     "docs": "ts-node -O '{\"module\":\"commonjs\"}' plugins/typedoc"
   },
   "dependencies": {
@@ -53,6 +54,7 @@
     "@testing-library/react": "^12.1.2",
     "@testing-library/react-hooks": "^7.0.2",
     "@types/jest": "^26.0.24",
+    "@types/node": "^16.11.12",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
@@ -75,6 +77,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.6.3",
     "jest-cli": "^26.6.3",
+    "lcov-result-merger": "^3.1.0",
     "nock": "^13.2.1",
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
