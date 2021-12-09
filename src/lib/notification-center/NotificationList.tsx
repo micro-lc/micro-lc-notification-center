@@ -1,4 +1,4 @@
-import React, {ReactElement} from 'react'
+import React, {ReactElement, useCallback, useMemo} from 'react'
 
 import {Typography} from 'antd'
 
@@ -18,10 +18,12 @@ export default function NotificationsList ({
   next,
   notifications
 }: NotificationsListProps) : ReactElement {
+  const containerId = useMemo(() => `micro-lc-notification-center-${Math.random().toString(36)}`, [])
+  const handleBackOnTop = useCallback(() => { document.getElementById(containerId).scrollTo(0, 0) }, [containerId])
   const {t} = useLocale()
 
   return (
-    <div className='notification-container' data-testid='notifications-container'>
+    <div className='notification-container' data-testid='notifications-container' id={containerId}>
       {error && <Text className='display-message' type='danger'>{t('errorMessage')}</Text>}
       {notifications.length > 0 ?
         notifications.map((notification, i) => (
@@ -34,9 +36,12 @@ export default function NotificationsList ({
       <Text className='display-message'>{t('noNotification')}</Text>
       }
       {
-        !done &&
-          <div style={{textAlign: 'center', marginBottom: '5px'}}>
+        !done ?
+          <div role='button' style={{textAlign: 'center', marginBottom: '5px'}} tabIndex={0}>
             <Text className='notification-button' disabled={loading} onClick={next} style={{marginBottom: '5px !important'}} >{t('loadingButton')}</Text>
+          </div> :
+          <div role='button' style={{textAlign: 'center', marginBottom: '5px'}} tabIndex={0}>
+            <Text className='notification-button' disabled={loading} onClick={handleBackOnTop} style={{marginBottom: '5px !important'}} >{t('backOnTop')}</Text>
           </div>
       }
     </div>

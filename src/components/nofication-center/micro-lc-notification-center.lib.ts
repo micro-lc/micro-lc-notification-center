@@ -74,6 +74,9 @@ async function loadNotifications (this: MicroLcNotificationCenter, reload = fals
       const {count, unread} = countsRes.value
       this.count = count
       this.unread = unread
+      if (count !== undefined && this.notifications.length === count) {
+        this.done = true
+      }
     }
   }).finally(() => {
     this.loading = false

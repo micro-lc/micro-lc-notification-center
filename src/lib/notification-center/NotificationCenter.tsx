@@ -7,7 +7,7 @@ import antd from 'antd/dist/antd.variable.min.css'
 import {parseCssVariable} from '../utils/css.utils'
 import {I18n, DefaultTranslations, PartialTranslations} from '../utils/i18n.utils'
 import styles from './notification-center.css'
-import NotificationsList from './NotificationsList'
+import NotificationsList from './NotificationList'
 import PopupTitle from './PopupTitle'
 
 type ReadStateHandler = (notification: Notification, index: number) => Promise<void>
@@ -43,7 +43,8 @@ const defaultTranslations: DefaultTranslations = {
   noNotification: 'No notification to show',
   errorMessage: 'An error occurred, try again',
   readAll: 'Mark all as read',
-  reload: 'Reload'
+  reload: 'Reload',
+  backOnTop: 'Back on top'
 }
 
 type PopoverContainerProps = {

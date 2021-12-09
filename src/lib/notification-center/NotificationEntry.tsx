@@ -18,7 +18,7 @@ export default function NotificationEntry ({title, createdAt, readState, onClick
 
   return (
     <Fragment>
-      <Row className='notification-item' data-testid='notification-row' onClick={onClick} style={{paddingLeft: '5px', paddingRight: '5px'}}>
+      <Row className='notification-item' data-testid='notification-row' onClick={onClick} role='button' style={{paddingLeft: '5px', paddingRight: '5px'}} tabIndex={0}>
         <Col span={22}>
           <Paragraph ellipsis={{rows: 3}} style={{marginBottom: '0px'}}>{title}</Paragraph>
           <Text className='notification-date'>{dayjs(createdAt).locale(lang).format(t('dateFormat'))}</Text>

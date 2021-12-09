@@ -1,3 +1,5 @@
+import {Notification} from '../notification-center'
+
 const START_DAYS_AGO = 90
 const today = new Date()
 const startFrom = new Date(today.getTime())
@@ -24,7 +26,7 @@ function randomString (length = 10) {
   return result
 }
 
-const genNotifications = (quantity: number) => Array(quantity).fill(0).map(() => ({
+const genNotifications = (quantity: number): Notification[] => Array(quantity).fill(0).map(() => ({
   _id: genId(),
   creatorId: genId(),
   createdAt: randomDate(),
@@ -32,4 +34,6 @@ const genNotifications = (quantity: number) => Array(quantity).fill(0).map(() =>
   readState: false
 }))
 
-export {genNotifications, randomString}
+const randomNumber = (start = 0, end = 10) => Math.floor(Math.random() * end) + start
+
+export {genNotifications, randomString, randomNumber}

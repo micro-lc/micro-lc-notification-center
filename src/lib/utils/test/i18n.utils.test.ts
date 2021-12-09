@@ -12,7 +12,7 @@ describe('i18n tests', () => {
     init()
     const {result: {current: {t, lang}}} = renderHook(() => useLocale())
     expect(lang).toBe('en')
-    expect(t('title')).toStrictEqual('title')
+    expect(t('title')).toBeUndefined()
   })
 
   it('should obtain locales from given i18n context on given 2-letters lang', () => {
@@ -35,8 +35,6 @@ describe('i18n tests', () => {
     expect(lang).toBe(initLang)
     expect(t('title')).toStrictEqual('Notifiche')
     expect(t('loadingButton')).toStrictEqual('Load')
-    // @ts-ignore
-    expect(t('no-key')).toStrictEqual('no-key')
   })
 
   it('should obtain locales from given i18n context on given 4-letters lang', () => {

@@ -23,7 +23,7 @@ export default function PopupTitle (props: PopupTitleProps) : ReactElement {
       </Col>
     </Row>
     <Row justify='space-between'>
-      <Col sm={8}>
+      <Col role='button' sm={8} tabIndex={0}>
         <Text
           className='notification-button'
           disabled={props.loading}
@@ -31,7 +31,7 @@ export default function PopupTitle (props: PopupTitleProps) : ReactElement {
           onClick={props.reload}
         >{t('reload')}</Text>
       </Col>
-      <Col sm={16} style={{textAlign: 'end'}}>
+      <Col role='button' sm={16} style={{textAlign: 'end'}} tabIndex={0}>
         {props.unread ?
         <Text
           className='notification-button'

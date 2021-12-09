@@ -2,9 +2,8 @@ import React from 'react'
 
 import {ByRoleMatcher, ByRoleOptions, fireEvent, render, waitFor} from '@testing-library/react'
 
-import {Notification, NotificationCenterProps} from '.'
-import {genNotifications} from '../utils/test.utils'
-import NotificationCenter from './NotificationCenter'
+import {genNotifications, randomNumber} from '../utils/test.utils'
+import NotificationCenter, {defaultTranslations as d, Notification, NotificationCenterProps} from './NotificationCenter'
 
 const defaultProps: NotificationCenterProps = {
   next: () => {},
@@ -25,10 +24,11 @@ describe('NotificationCenter tests', () => {
   let notifications: Notification[]
   let notificationsLength: number
   beforeEach(() => {
-    const num = Math.floor(Math.random() * 10) + 3
+    const num = randomNumber(3, 10)
     notifications = genNotifications(num)
     notificationsLength = num
   })
+
   it('should render with notifications', async () => {
     const {getByRole, getAllByRole, getByText} = render(<NotificationCenter {...defaultProps} notifications={notifications} unread={1}/>)
     clickOnNotificationCenterIcon(getByRole)
@@ -36,10 +36,10 @@ describe('NotificationCenter tests', () => {
     await waitFor(() => {
       const headers = getAllByRole(/heading/i)
       expect(headers).toHaveLength(1)
-      expect(headers[0].innerHTML).toStrictEqual('title')
-      expect(getByText('reload')).toBeInTheDocument()
-      expect(getByText('loadingButton')).toBeInTheDocument()
-      expect(getByText('readAll')).toBeInTheDocument()
+      expect(headers[0].innerHTML).toMatch(d.title)
+      expect(getByText(d.reload)).toBeInTheDocument()
+      expect(getByText(d.loadingButton)).toBeInTheDocument()
+      expect(getByText(d.readAll)).toBeInTheDocument()
     })
   })
 
@@ -48,7 +48,7 @@ describe('NotificationCenter tests', () => {
     clickOnNotificationCenterIcon(getByRole)
 
     await waitFor(() => {
-      expect(getByText('loadingButton')).toBeInTheDocument()
+      expect(getByText(d.loadingButton)).toBeInTheDocument()
     })
   })
 
@@ -57,7 +57,7 @@ describe('NotificationCenter tests', () => {
     clickOnNotificationCenterIcon(getByRole)
 
     await waitFor(() => {
-      expect(getByText('readAll')).toBeInTheDocument()
+      expect(getByText(d.readAll)).toBeInTheDocument()
     })
   })
 
@@ -66,7 +66,7 @@ describe('NotificationCenter tests', () => {
     clickOnNotificationCenterIcon(getByRole)
 
     await waitFor(() => {
-      expect(queryByText('readAll')).toBeNull()
+      expect(queryByText(d.readAll)).toBeNull()
     })
   })
 
@@ -75,7 +75,7 @@ describe('NotificationCenter tests', () => {
     clickOnNotificationCenterIcon(getByRole)
 
     await waitFor(() => {
-      expect(getByText('errorMessage')).toBeInTheDocument()
+      expect(getByText(d.errorMessage)).toBeInTheDocument()
     })
   })
 
@@ -84,7 +84,7 @@ describe('NotificationCenter tests', () => {
     clickOnNotificationCenterIcon(getByRole)
 
     await waitFor(() => {
-      expect(getByText('noNotification')).toBeInTheDocument()
+      expect(getByText(d.noNotification)).toBeInTheDocument()
     })
   })
 
@@ -177,52 +177,40 @@ describe('NotificationCenter tests', () => {
   })
 
   it('should reload notifications when reload button is pressed', async () => {
-    const defaultLanguage = window.navigator.language
-    Object.defineProperty(window.navigator, 'language', {writable: true, value: 'it'})
-    const locales = {
-      reload: {
-        it: 'Ricarica'
-      }
-    }
-    const reloadFunction = jest.fn()
-    const {getByText, getByRole} = render(<NotificationCenter {...defaultProps} locales={locales} notifications={notifications} reload={reloadFunction}/>)
+    const reload = jest.fn()
+    const {getByText, getByRole} = render(<NotificationCenter {...defaultProps} notifications={notifications} reload={reload}/>)
     clickOnNotificationCenterIcon(getByRole)
-    const reloadButton = getByText('Ricarica')
-    fireEvent.click(reloadButton)
+
+    fireEvent.click(getByText(/reload/i))
     await waitFor(() => {
-      expect(reloadFunction).toHaveBeenCalledTimes(1)
+      expect(reload).toHaveBeenCalledTimes(1)
     })
-    Object.defineProperty(window.navigator, 'language', {writable: true, value: defaultLanguage})
   })
 
   it('should load more notifications when loadMore button is pressed', async () => {
-    const defaultLanguage = window.navigator.language
-    Object.defineProperty(window.navigator, 'language', {writable: true, value: 'it'})
-    const locales = {
-      loadingButton: {
-        it: 'Carica altro'
-      }
-    }
+    const secondPageLength = randomNumber(1, 10)
     const loadMoreFunction = jest.fn().mockImplementation(() => {
-      notificationsLength += 5
-      notifications = genNotifications(notificationsLength)
+      notificationsLength += secondPageLength
+      notifications = [...notifications, ...genNotifications(secondPageLength)]
     })
-    const {getByText, getByRole, getAllByTestId, rerender} = render(<NotificationCenter {...defaultProps} locales={locales} next={loadMoreFunction} notifications={notifications}/>)
+
+    const {getByText, getByRole, getAllByTestId, rerender} = render(<NotificationCenter {...defaultProps} next={loadMoreFunction} notifications={notifications}/>)
     clickOnNotificationCenterIcon(getByRole)
+
     let notificationsEntry = getAllByTestId('notification-row')
     await waitFor(() => {
       expect(notificationsEntry).toHaveLength(notificationsLength)
     })
 
-    const loadMoreButton = getByText('Carica altro')
+    const loadMoreButton = getByText(/load more/i)
     fireEvent.click(loadMoreButton)
     rerender(<NotificationCenter {...defaultProps} notifications={notifications}/>)
+
     notificationsEntry = getAllByTestId('notification-row')
     await waitFor(() => {
       expect(loadMoreFunction).toHaveBeenCalledTimes(1)
       expect(notificationsEntry).toHaveLength(notificationsLength)
     })
-    Object.defineProperty(window.navigator, 'language', {writable: true, value: defaultLanguage})
   })
 
   it('should mark all notifications as already read when readAll button is pressed', async () => {

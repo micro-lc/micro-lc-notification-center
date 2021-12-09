@@ -2,7 +2,16 @@ import {createContext, useContext} from 'react'
 
 export type LocalizedString = string | Record<string, string>
 
-export type Translations = Record<'title' | 'loadingButton' | 'dateFormat' | 'errorMessage' | 'noNotification' | 'readAll' | 'reload', LocalizedString>
+export type LanguageKeys =
+  'title' |
+  'loadingButton' |
+  'dateFormat' |
+  'errorMessage' |
+  'noNotification' |
+  'readAll' |
+  'reload' |
+  'backOnTop'
+export type Translations = Record<LanguageKeys, LocalizedString>
 export type DefaultTranslations = Record<keyof Translations, string>
 export type PartialTranslations = Partial<Translations>
 
@@ -30,14 +39,11 @@ function useLocale () {
       } else if (availableKeys.includes(lang.substring(0, 2))) {
         return translation[lang.substring(0, 2)]
       }
-
-      return defaultTranslations[key]
     }
 
-    return key
+    return defaultTranslations?.[key]
   }
 
   return {t, lang}
 }
-
 export {I18n, useLocale}
