@@ -21,7 +21,7 @@ export default function NotificationsList ({
   const {t} = useLocale()
 
   return (
-    <div className='notification-container'>
+    <div className='notification-container' data-testid='notifications-container'>
       {error && <Text className='display-message' type='danger'>{t('errorMessage')}</Text>}
       {notifications.length > 0 ?
         notifications.map((notification, i) => (

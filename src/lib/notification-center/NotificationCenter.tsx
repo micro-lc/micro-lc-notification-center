@@ -1,7 +1,7 @@
 import React, {ReactElement, useMemo} from 'react'
 
 import {BellOutlined} from '@ant-design/icons'
-import {Button, Popover} from 'antd'
+import {Button, Popover, Badge} from 'antd'
 import antd from 'antd/dist/antd.variable.min.css'
 
 import {parseCssVariable} from '../utils/css.utils'
@@ -65,7 +65,8 @@ function NotificationCenter ({
   error,
   done,
   onClick,
-  onClickAll
+  onClickAll,
+  unread
 }: NotificationCenterProps): ReactElement {
   const containerId = useMemo(() => `micro-lc-notification-center-${Math.random().toString(36)}`, [])
 
@@ -88,16 +89,18 @@ function NotificationCenter ({
         }
         getPopupContainer={() => document.getElementById(containerId)}
         placement='bottomRight'
-        title={<PopupTitle loading={loading} onClickAll={onClickAll} reload={reload} />}
+        title={<PopupTitle loading={loading} onClickAll={onClickAll} reload={reload} unread={unread > 0}/>}
         trigger='click'
       >
-        <Button
-          shape='circle'
-          style={{color: 'white', padding: 'initial'}}
-          type='primary'
-        >
-          <BellOutlined />
-        </Button>
+        <Badge count={unread} offset={[-5, 5]} size='small' style={{paddingLeft: '3px', paddingRight: '3px'}}>
+          <Button
+            shape='circle'
+            style={{color: 'white', padding: 'initial'}}
+            type='primary'
+          >
+            <BellOutlined />
+          </Button>
+        </Badge>
       </Popover>
     </I18n.Provider>
   )

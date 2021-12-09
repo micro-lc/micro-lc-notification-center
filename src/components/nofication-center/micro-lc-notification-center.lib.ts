@@ -19,6 +19,7 @@ async function onClick (this: MicroLcNotificationCenter, {readState, ...rest}: N
         {...rest, readState: newReadState},
         ...this.notifications.slice(index + 1)
       ]
+      this.unread--
     })
   }
 }
@@ -35,6 +36,7 @@ async function onClickAll (this: MicroLcNotificationCenter): Promise<number> {
       el.readState = true
       return el
     })
+    this.unread = 0
     return res
   })
 }

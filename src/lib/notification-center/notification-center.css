@@ -13,6 +13,30 @@
   font-size: 14px !important;
 }
 
+@media only screen and (max-width: 450px) {
+  .notification-container {
+    min-width: 90vw !important;
+    max-width: 95vw !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+  }
+
+  .ant-popover-inner {
+    max-width: 95vw !important;
+    border-radius: 8px !important;
+  }
+
+  .notification-item {
+    max-width: 95vw !important;
+    border-radius: 8px !important;
+  }
+
+  .ant-popover-inner-content {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
 .notification-container {
   min-width: 20vw;
   max-width: 30vw;
@@ -35,6 +59,7 @@
 }
 
 .ant-popover-title {
+  min-width: 0 !important;
   margin-bottom: 5px !important;
 }
 

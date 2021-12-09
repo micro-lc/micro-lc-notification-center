@@ -50,10 +50,11 @@ class AllNotifications {
   }
 
   patch (_id, readState) {
-    this.notifications.forEach((el, i, arr) => {
+    this.notifications = this.notifications.map((el) => {
       if (el._id === _id) {
-        arr[i].readState = readState
+        return {...el, readState}
       }
+      return el
     })
   }
 
