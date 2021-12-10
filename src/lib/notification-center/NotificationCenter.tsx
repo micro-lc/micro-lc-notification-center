@@ -14,12 +14,19 @@ type ReadStateHandler = (notification: Notification, index: number) => Promise<v
 
 type AllReadStateHandler = () => Promise<number>
 
+export type CallbackHref = {
+  kind: 'href' | string
+  content: string
+}
+
 export type Notification = {
   _id: string
   creatorId: string
   createdAt: string
   title: string
   readState?: boolean
+  content?: string
+  onClickCallback?: CallbackHref
 }
 
 export type NotificationCenterProps = {

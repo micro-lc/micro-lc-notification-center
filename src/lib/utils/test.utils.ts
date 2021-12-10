@@ -31,9 +31,14 @@ const genNotifications = (quantity: number): Notification[] => Array(quantity).f
   creatorId: genId(),
   createdAt: randomDate(),
   title: randomString(),
-  readState: false
+  readState: false,
+  content: randomString(100),
+  onClickCallback: {
+    kind: 'href',
+    content: `?_q=${randomString(5)}`
+  }
 }))
 
 const randomNumber = (start = 0, end = 10) => Math.floor(Math.random() * end) + start
 
-export {genNotifications, randomString, randomNumber}
+export {genNotifications, randomString, randomNumber, genId, randomDate}

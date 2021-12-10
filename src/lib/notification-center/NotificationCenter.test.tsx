@@ -110,6 +110,7 @@ describe('NotificationCenter tests', () => {
 
     notifications.forEach((notification) => {
       expect(getByText(notification.title)).toBeInTheDocument()
+      expect(getByText(notification.content)).toBeInTheDocument()
     })
   })
 

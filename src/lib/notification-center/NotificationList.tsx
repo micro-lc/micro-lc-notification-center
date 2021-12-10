@@ -3,12 +3,21 @@ import React, {ReactElement, useCallback, useMemo} from 'react'
 import {Typography} from 'antd'
 
 import {useLocale} from '../utils/i18n.utils'
-import {NotificationCenterProps} from './NotificationCenter'
+import {getLink} from '../utils/url.utils'
+import {NotificationCenterProps, Notification} from './NotificationCenter'
 import NotificationEntry from './NotificationEntry'
 
 const {Text} = Typography
 
 export type NotificationsListProps = Omit<NotificationCenterProps, 'locales' | 'reload' | 'onClickAll'>
+
+function handleClick (onClick: NotificationsListProps['onClick'], notification: Notification, i: number): () => Promise<void> {
+  return async () => {
+    const promise = onClick(notification, i)
+    getLink(notification).click()
+    return promise
+  }
+}
 
 export default function NotificationsList ({
   error,
@@ -17,7 +26,7 @@ export default function NotificationsList ({
   onClick,
   next,
   notifications
-}: NotificationsListProps) : ReactElement {
+}: NotificationsListProps): ReactElement {
   const {t} = useLocale()
 
   const containerId = useMemo(() => `micro-lc-notification-center-${Math.random().toString(36)}`, [])
@@ -33,7 +42,7 @@ export default function NotificationsList ({
       {notifications.map((notification, i) => (
           <NotificationEntry
             key={i}
-            onClick={() => onClick(notification, i)}
+            onClick={handleClick(onClick, notification, i)}
             {...notification}
           />
       ))}

@@ -28,7 +28,12 @@ const mockNotifications = (quantity) => Array(quantity).fill(0).map(() => ({
   _id: genId(),
   creatorId: genId(),
   createdAt: randomDate(),
-  title: randomString(120)
+  title: randomString(),
+  content: randomString(100),
+  onClickCallback: {
+    kind: 'href',
+    content: `?_q=${randomString(5)}`
+  }
 }))
 
 const oldestFirst = (a, b) => (a < b) ? -1 : ((a > b) ? 1 : 0)
