@@ -52,7 +52,7 @@ and to each key, one could attach either a string value (which will override any
   'en-AU': "English Translation",
   fr: "Traduction Française",
   de: "Deutsche Übersetzung",
-  ch: "中文翻译",
+  zh: "中文翻译",
   ...
 }
 ```

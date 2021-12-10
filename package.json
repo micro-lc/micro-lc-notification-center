@@ -14,7 +14,6 @@
     "dist/",
     "loader/"
   ],
-  "private": true,
   "scripts": {
     "prepare": "husky install",
     "clean": "rimraf coverage loader dist www node_modules yarn-error.log",
