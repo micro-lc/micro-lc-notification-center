@@ -16,7 +16,7 @@ function randomDate (start = startFrom, end = today) {
 
 function randomString (length = 10) {
   let result = ''
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '
+  const characters = ' ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '
   const charactersLength = characters.length
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength))
@@ -24,12 +24,26 @@ function randomString (length = 10) {
   return result
 }
 
+function randomNumber (start = 0, end = 10) {
+  return Math.floor(Math.random() * end) + start
+}
+
+function contentGenerator () {
+  const words = ['The sky', 'above', 'the port', 'was', 'the color of television', 'tuned', 'to', 'a dead channel', '.', 'All', 'this happened', 'more or less', '.', 'I', 'had', 'the story', 'bit by bit', 'from various people', 'and', 'as generally', 'happens', 'in such cases', 'each time', 'it', 'was', 'a different story', '.', 'It', 'was', 'a pleasure', 'to', 'burn']
+  const text = []
+  Array(randomNumber(0, 30)).fill(0).forEach(() => {
+    text.push(words[randomNumber(0, words.length)])
+  })
+
+  return text.join(' ')
+}
+
 const mockNotifications = (quantity) => Array(quantity).fill(0).map(() => ({
   _id: genId(),
   creatorId: genId(),
   createdAt: randomDate(),
-  title: randomString(),
-  content: randomString(100),
+  title: ['Email', 'Appointment', 'Notification', 'Scheduled meeting'][randomNumber(0, 4)],
+  content: contentGenerator(),
   onClickCallback: {
     kind: 'href',
     content: `?_q=${randomString(5)}`
