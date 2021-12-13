@@ -4,15 +4,23 @@ import {
   ByRoleMatcher,
   ByRoleOptions,
   fireEvent,
-  render
+  render,
+  waitFor
 } from '@testing-library/react'
 
 import {genNotifications, randomNumber} from '../utils/test.utils'
+import * as urlUtils from '../utils/url.utils'
 import NotificationCenter, {
   defaultTranslations as d,
   Notification,
   NotificationCenterProps
 } from './NotificationCenter'
+
+const getLinkSpy = jest.spyOn(urlUtils, 'getLink').mockImplementation(() => {
+  const a = document.createElement('a')
+  a.click = jest.fn()
+  return a
+})
 
 const defaultProps: NotificationCenterProps = {
   next: () => {},
@@ -127,14 +135,17 @@ describe('NotificationCenter tests', () => {
     })
   })
 
-  it('handle click on unread notification', () => {
-    const onClick = jest.fn()
+  it('handle click on unread notification', async () => {
+    const onClick = jest.fn().mockResolvedValue(undefined)
     const {getByRole, getAllByTestId} = render(<NotificationCenter {...defaultProps} notifications={notifications} onClick={onClick}/>)
     clickOnNotificationCenterIcon(getByRole)
 
     const [notificationsEntry] = getAllByTestId('notification-row')
     fireEvent.click(notificationsEntry)
     expect(onClick).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(getLinkSpy.mock.results[0].value.click).toHaveBeenCalledTimes(1)
+    })
   })
 
   it('should reload notifications when reload button is pressed', () => {
