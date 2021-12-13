@@ -1,6 +1,6 @@
 {
   "name": "micro-lc-notification-center",
-  "version": "0.1.0",
+  "version": "1.0.0-rc.1",
   "description": "micro-lc plugin to handle notifications",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
