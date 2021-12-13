@@ -1,6 +1,6 @@
 import axios, {AxiosResponse} from 'axios'
 
-import {MicroLcNotificationCenter} from '../components/nofication-center/micro-lc-notification-center'
+import {MicroLcNotificationCenter} from '../components/notification-center/micro-lc-notification-center'
 import {Notification} from '../lib'
 
 export type ReadStateRequestBody = {

@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { MicroLcHeaders } from "./components/nofication-center/micro-lc-notification-center";
+import { MicroLcHeaders } from "./components/notification-center/micro-lc-notification-center";
 import { PartialTranslations } from "./lib/utils/i18n.utils";
 export namespace Components {
     interface MicroLcNotificationCenter {

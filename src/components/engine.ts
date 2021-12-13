@@ -4,7 +4,7 @@ import {h, Host, VNode} from '@stencil/core'
 import ReactDOM from 'react-dom'
 
 import {setCssVariables} from '../utils/shadowRootCSS'
-import {MicroLcNotificationCenter} from './nofication-center/micro-lc-notification-center'
+import {MicroLcNotificationCenter} from './notification-center/micro-lc-notification-center'
 
 export interface Creatable<P = Record<string, never>> {
   wasDetached: boolean

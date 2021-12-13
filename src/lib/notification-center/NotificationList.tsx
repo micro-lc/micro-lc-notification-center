@@ -13,9 +13,8 @@ export type NotificationsListProps = Omit<NotificationCenterProps, 'locales' | '
 
 function handleClick (onClick: NotificationsListProps['onClick'], notification: Notification, i: number): () => Promise<void> {
   return async () => {
-    const promise = onClick(notification, i)
     const link = getLink(notification)
-    await promise.then(() => {
+    await onClick(notification, i).finally(() => {
       link.click()
     })
   }
