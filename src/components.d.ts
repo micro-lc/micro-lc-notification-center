@@ -5,10 +5,14 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { MicroLcHeaders } from "./components/notification-center/micro-lc-notification-center";
+import { ClickStrategies, MicroLcHeaders } from "./components/notification-center/micro-lc-notification-center";
 import { PartialTranslations } from "./lib/utils/i18n.utils";
 export namespace Components {
     interface MicroLcNotificationCenter {
+        /**
+          * `clickStrategy` (optional) is an enum taking values 'default' | 'href' | 'replace' | 'push' which correspond to what happens when a notification is clicked. Default and href do create an `anchor` and click it. `replace` triggers the location replace while `push` pushes onto window.history stack
+         */
+        "clickStrategy": ClickStrategies;
         /**
           * `endpoint` (optional) is the http client url to fetch notifications. It defaults to relative ref: `/api/v1/micro-lc-notification-center`. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
          */
@@ -40,6 +44,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface MicroLcNotificationCenter {
+        /**
+          * `clickStrategy` (optional) is an enum taking values 'default' | 'href' | 'replace' | 'push' which correspond to what happens when a notification is clicked. Default and href do create an `anchor` and click it. `replace` triggers the location replace while `push` pushes onto window.history stack
+         */
+        "clickStrategy"?: ClickStrategies;
         /**
           * `endpoint` (optional) is the http client url to fetch notifications. It defaults to relative ref: `/api/v1/micro-lc-notification-center`. It can also be used as a plain attribute by setting ```html <body>   <micro-lc-notification-center     endpoint="https://example.com/my-notifications"   ></micro-lc-notification-center> </body> ```
          */
