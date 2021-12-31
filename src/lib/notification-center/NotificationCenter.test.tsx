@@ -8,6 +8,7 @@ import {
   waitFor
 } from '@testing-library/react'
 
+import {ClickStrategies} from '../../components/notification-center/micro-lc-notification-center'
 import {genNotifications, randomNumber} from '../utils/test.utils'
 import * as urlUtils from '../utils/url.utils'
 import NotificationCenter, {
@@ -30,7 +31,8 @@ const defaultProps: NotificationCenterProps = {
   notifications: [],
   onClick: async () => {},
   onClickAll: async () => { return 0 },
-  done: false
+  done: false,
+  clickStrategy: 'default'
 }
 
 function clickOnNotificationCenterIcon (getByRole: (role: ByRoleMatcher, options?: ByRoleOptions) => HTMLElement): boolean {
@@ -135,9 +137,9 @@ describe('NotificationCenter tests', () => {
     })
   })
 
-  it('handle click on unread notification', async () => {
+  it.each<[ClickStrategies]>([['default'], ['href']])('handle click on unread notification with % strategy', async (strategy) => {
     const onClick = jest.fn().mockResolvedValue(undefined)
-    const {getByRole, getAllByTestId} = render(<NotificationCenter {...defaultProps} notifications={notifications} onClick={onClick}/>)
+    const {getByRole, getAllByTestId} = render(<NotificationCenter {...defaultProps} clickStrategy={strategy} notifications={notifications} onClick={onClick}/>)
     clickOnNotificationCenterIcon(getByRole)
 
     const [notificationsEntry] = getAllByTestId('notification-row')
@@ -146,6 +148,38 @@ describe('NotificationCenter tests', () => {
     await waitFor(() => {
       expect(getLinkSpy.mock.results[0].value.click).toHaveBeenCalledTimes(1)
     })
+  })
+
+  it('handle click on unread notification with replace strategy', async () => {
+    const actualLocation = window.location
+    Object.defineProperty(window, 'location', {writable: true, value: {replace: jest.fn()}})
+    const onClick = jest.fn().mockResolvedValue(undefined)
+    const {getByRole, getAllByTestId} = render(<NotificationCenter {...defaultProps} clickStrategy='replace' notifications={notifications} onClick={onClick} />)
+    clickOnNotificationCenterIcon(getByRole)
+
+    const [notificationsEntry] = getAllByTestId('notification-row')
+    fireEvent.click(notificationsEntry)
+    expect(onClick).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(window.location.replace).toHaveBeenCalledTimes(1)
+    })
+    Object.defineProperty(window, 'location', {writable: true, value: actualLocation})
+  })
+
+  it('handle click on unread notification with push strategy', async () => {
+    const actualHistory = window.history
+    Object.defineProperty(window, 'history', {writable: true, value: {pushState: jest.fn()}})
+    const onClick = jest.fn().mockResolvedValue(undefined)
+    const {getByRole, getAllByTestId} = render(<NotificationCenter {...defaultProps} clickStrategy='push' notifications={notifications} onClick={onClick} />)
+    clickOnNotificationCenterIcon(getByRole)
+
+    const [notificationsEntry] = getAllByTestId('notification-row')
+    fireEvent.click(notificationsEntry)
+    expect(onClick).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(window.history.pushState).toHaveBeenCalledTimes(1)
+    })
+    Object.defineProperty(window, 'history', {writable: true, value: actualHistory})
   })
 
   it('should reload notifications when reload button is pressed', () => {

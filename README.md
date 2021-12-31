@@ -27,6 +27,7 @@ comes with few customizable props
 |`headers`| - |{ [x: string]: string; }|{}|headers included in any HTTP request|
 |`limit`|`limit`|number|10|notification pagination limit|
 |`locales`| - |[PartialTranslations](#partial-translations)|{}|language locales and translations|
+|`clickStrategy`|`click-strategy`|[ClickStrategies](#click-strategies)|'default'|establishes what to do when a single notification is clicked|
 
 ## partial translations
 
@@ -58,6 +59,20 @@ and to each key, one could attach either a string value (which will override any
 ```
 
 try [here](src/index.html) for an example of configured locales
+
+## click strategies
+
+```typescript
+enum ClickStrategies =
+  'default' |
+  'href' |
+  'replace' |
+  'push'
+```
+
+An on-click-strategy correspond to what happens when a notification is clicked.
+`default` and `href` do create an invisible `anchor` and click it, `replace`
+triggers `window.location.replace` while `push` pushes onto `window.history` stack.
 
 # backend communication
 

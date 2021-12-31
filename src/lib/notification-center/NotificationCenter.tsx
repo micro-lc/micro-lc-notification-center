@@ -1,9 +1,10 @@
-import React, {ReactElement, useMemo} from 'react'
+import React, {ReactElement, useMemo, useState} from 'react'
 
 import {BellOutlined} from '@ant-design/icons'
 import {Button, Popover, Badge} from 'antd'
 import antd from 'antd/dist/antd.variable.min.css'
 
+import {ClickStrategies} from '../../components/notification-center/micro-lc-notification-center'
 import {parseCssVariable} from '../utils/css.utils'
 import {I18n, DefaultTranslations, PartialTranslations} from '../utils/i18n.utils'
 import styles from './notification-center.css'
@@ -41,6 +42,7 @@ export type NotificationCenterProps = {
   onClickAll: AllReadStateHandler
   count?: number
   unread?: number
+  clickStrategy: ClickStrategies
 }
 
 const defaultTranslations: DefaultTranslations = {
@@ -65,18 +67,16 @@ function PopoverContainer ({id}: PopoverContainerProps) {
 }
 
 function NotificationCenter ({
-  notifications,
   loading,
   locales,
   reload,
-  next,
-  error,
-  done,
   onClick,
   onClickAll,
-  unread
+  unread,
+  ...rest
 }: NotificationCenterProps): ReactElement {
   const containerId = useMemo(() => `micro-lc-notification-center-${Math.random().toString(36)}`, [])
+  const [visible, setVisible] = useState(false)
 
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
@@ -87,21 +87,24 @@ function NotificationCenter ({
         className='popover-content-container'
         content={
           <NotificationsList
-            done={done}
-            error={error}
             loading={loading}
-            next={next}
-            notifications={notifications}
-            onClick={onClick}
+            onClick={async (notification, index) => {
+              setVisible(false)
+              return onClick(notification, index)
+            }}
+            {...rest}
           />
         }
         getPopupContainer={() => document.getElementById(containerId)}
+        onVisibleChange={(v) => setVisible(v)}
         placement='bottomRight'
         title={<PopupTitle loading={loading} onClickAll={onClickAll} reload={reload} unread={unread > 0}/>}
         trigger='click'
+        visible={visible}
       >
         <Badge count={unread} offset={[-5, 5]} size='small' style={{paddingLeft: '3px', paddingRight: '3px'}}>
           <Button
+            onClick={() => { setVisible(t => !t) }}
             shape='circle'
             style={{color: 'white', padding: 'initial'}}
             type='primary'

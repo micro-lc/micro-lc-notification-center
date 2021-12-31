@@ -14,6 +14,7 @@ type Pagination = {
 }
 
 export type MicroLcHeaders = Record<string, string>
+export type ClickStrategies = 'default' | 'href' | 'replace' | 'push'
 
 /**
  * This is the micro-lc notification center web-component
@@ -68,6 +69,15 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
    */
   @Prop() locales: PartialTranslations = {}
 
+  /**
+   * `clickStrategy` (optional) is an enum taking values
+   * 'default' | 'href' | 'replace' | 'push' which correspond to
+   * what happens when a notification is clicked. Default and href do create
+   * an `anchor` and click it. `replace` triggers the location replace
+   * while `push` pushes onto window.history stack
+   */
+  @Prop() clickStrategy: ClickStrategies = 'default'
+
   @State() notifications: Notification[] = []
   @State() loading?: boolean
   @State() page: Pagination = {skip: 0}
@@ -107,7 +117,8 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
       error: this.error,
       done: this.done,
       onClick: this.onClick,
-      onClickAll: this.onClickAll
+      onClickAll: this.onClickAll,
+      clickStrategy: this.clickStrategy
     }
 
     if (this.loading !== undefined) {
