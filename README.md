@@ -110,12 +110,18 @@ should be ordered by creation date descending.
     "type": "object",
     "properties": {
       "title": {
-        "type": "string"
+        "anyOf": [
+          {"type": "string"},
+          {"type": "object"}
+        ]
       },
       "content": {
-        "type": "string"
+        "anyOf": [
+          {"type": "string"},
+          {"type": "object"}
+        ]
       },
-      "read": {
+      "readState": {
         "type": "boolean"
       },
       "createdAt": {

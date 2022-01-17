@@ -1,7 +1,7 @@
 import {renderHook} from '@testing-library/react-hooks'
 
 import {defaultTranslations} from '../../notification-center/NotificationCenter'
-import {I18n, useLocale} from '../i18n.utils'
+import {I18n, translate, useLocale} from '../i18n.utils'
 
 const init = (lang = 'en') => {
   Object.defineProperty(window.navigator, 'language', {writable: true, value: lang})
@@ -93,5 +93,18 @@ describe('i18n tests', () => {
       }
     })
     expect(t('title')).toStrictEqual('given string')
+  })
+
+  it.each([
+    [{en: 'title', it: 'titolo'}, undefined, 'title'],
+    [{en: 'title', it: 'titolo'}, 'it-IT', 'titolo'],
+    [{en: 'title', it: 'titolo'}, 'it', 'titolo'],
+    [{en: 'title', it: 'titolo'}, 'it', 'titolo', true],
+    [{de: 'title'}, 'en', '[object Object]', true]
+  ])('should translate object %s on language %s', (obj, lang, expected, i = false) => {
+    if (i) {
+      init(lang)
+    }
+    expect(translate(obj, lang)).toStrictEqual(expected)
   })
 })

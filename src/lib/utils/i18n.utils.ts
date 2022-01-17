@@ -17,6 +17,19 @@ export type PartialTranslations = Partial<Translations>
 
 const DEFAULT_LANG = 'en'
 
+function translate (options: Record<string, string>, lang: string = navigator.language || DEFAULT_LANG): string {
+  if (options[lang]) {
+    return options[lang]
+  }
+
+  const availableKeys = Object.keys(options)
+  if (availableKeys.includes(lang.substring(0, 2))) {
+    return options[lang.substring(0, 2)]
+  }
+
+  return options.toString()
+}
+
 const I18n = createContext<{
   defaultTranslations?: DefaultTranslations
   locales?: PartialTranslations
@@ -46,4 +59,4 @@ function useLocale () {
 
   return {t, lang}
 }
-export {I18n, useLocale}
+export {I18n, useLocale, translate}

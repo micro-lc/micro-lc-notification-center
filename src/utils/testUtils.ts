@@ -1,6 +1,6 @@
 import {SpecPage} from '@stencil/core/internal'
 
-import {Notification} from '../lib'
+import {LocalizedNotification} from '../components/notification-center/micro-lc-notification-center'
 
 const START_DAYS_AGO = 90
 const today = new Date()
@@ -28,18 +28,18 @@ function randomString (length = 10) {
   return result
 }
 
-const mockNotifications = (quantity: number): Notification[] =>
+const mockNotifications = (quantity: number, intl = false): LocalizedNotification[] =>
   Array(quantity).fill(0).map(() => ({
     _id: genId(),
     creatorId: genId(),
     createdAt: randomDate(),
-    title: randomString()
+    title: intl ? {en: randomString(), it: randomString()} : randomString()
   }))
 
 const oldestFirst = (a: string, b: string) => (a < b) ? -1 : ((a > b) ? 1 : 0)
 
 class AllNotifications {
-  notifications: Notification[]
+  notifications: LocalizedNotification[]
   constructor (quantity: number, unread: number) {
     this.notifications = mockNotifications(quantity)
     this.notifications.sort(({createdAt: a}, {createdAt: b}) => -oldestFirst(a, b))
@@ -50,7 +50,7 @@ class AllNotifications {
     })
   }
 
-  slice (start?: number, end?: number): Notification[] {
+  slice (start?: number, end?: number): LocalizedNotification[] {
     return this.notifications.slice(start, end)
   }
 }

@@ -30,19 +30,24 @@ function randomNumber (start = 0, end = 10) {
 
 function contentGenerator () {
   const words = ['The sky', 'above', 'the port', 'was', 'the color of television', 'tuned', 'to', 'a dead channel', '.', 'All', 'this happened', 'more or less', '.', 'I', 'had', 'the story', 'bit by bit', 'from various people', 'and', 'as generally', 'happens', 'in such cases', 'each time', 'it', 'was', 'a different story', '.', 'It', 'was', 'a pleasure', 'to', 'burn']
+  const itaWords = ['Posso', 'andare', 'a', 'capo', 'durante', 'la', 'definizione', 'di', 'una', 'stringa', 'per', 'rendere', 'il', 'codice', 'più', 'pulito,', 'senza', 'però', 'aggiungere', 'implicitamente', 'il', 'carattere', 'di', 'new', 'line']
   const text = []
+  const itaText = []
   Array(randomNumber(0, 30)).fill(0).forEach(() => {
     text.push(words[randomNumber(0, words.length)])
   })
+  Array(randomNumber(0, 30)).fill(0).forEach(() => {
+    itaText.push(itaWords[randomNumber(0, itaWords.length)])
+  })
 
-  return text.join(' ')
+  return {en: text.join(' '), it: itaText.join(' ')}
 }
 
 const mockNotifications = (quantity) => Array(quantity).fill(0).map(() => ({
   _id: genId(),
   creatorId: genId(),
   createdAt: randomDate(),
-  title: ['Email', 'Appointment', 'Notification', 'Scheduled meeting'][randomNumber(0, 4)],
+  title: ['Email', {en: 'Appointment', it: 'Appuntamento'}, {en: 'Notification', it: 'Notifica'}, {en: 'Scheduled meeting', it: 'Appuntamento schedulato'}][randomNumber(0, 4)],
   content: contentGenerator(),
   onClickCallback: {
     kind: 'href',

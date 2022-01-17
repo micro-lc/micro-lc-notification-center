@@ -1,6 +1,29 @@
-import {Notification} from '../../lib'
+import type {Notification} from '../../lib'
+import {translate} from '../../lib/utils/i18n.utils'
 import {Counters, getCounts, getNotifications, patchAllReadState, patchReadState} from '../../utils/notificationsClient'
-import {MicroLcNotificationCenter} from './micro-lc-notification-center'
+import type {LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
+
+function localizeNotifications (notifications: LocalizedNotification[]): Notification[] {
+  return notifications.map(({title: incomingTitle, content: incomingContent, ...rest}) => {
+    let title: string
+    let content: string | undefined
+    if (typeof incomingTitle === 'string') {
+      title = incomingTitle
+    } else {
+      title = translate(incomingTitle)
+    }
+
+    if (incomingContent === undefined) {
+      content = undefined
+    } else if (typeof incomingContent === 'string') {
+      content = incomingContent
+    } else {
+      content = translate(incomingContent)
+    }
+
+    return {title, content, ...rest}
+  })
+}
 
 /**
  * Patches `readState` of a given notification and keeps track
@@ -54,11 +77,11 @@ async function loadNotifications (this: MicroLcNotificationCenter, reload = fals
   this.loading = true
   this.done = false
   await Promise.allSettled([
-    getNotifications.bind<((skip: number) => Promise<Notification[]>)>(this)(skip),
+    getNotifications.bind<((skip: number) => Promise<LocalizedNotification[]>)>(this)(skip),
     getCounts.bind<(() => Promise<Counters>)>(this)()
   ]).then(([notRes, countsRes]) => {
     if (notRes.status === 'fulfilled') {
-      const notifications = notRes.value
+      const notifications = localizeNotifications(notRes.value)
       this.error = false
       this.notifications = reload ? notifications : [...this.notifications, ...notifications]
       this.page = {skip: skip + this.limit, last: skip}

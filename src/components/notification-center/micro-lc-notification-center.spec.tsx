@@ -3,10 +3,9 @@ import {newSpecPage, SpecPage} from '@stencil/core/testing'
 import nock from 'nock'
 
 import {JSX} from '../../components'
-import {Notification} from '../../lib'
 import {DEFAULT_PAGINATION_LIMIT} from '../../utils/notificationsClient'
 import Sandbox, {AllNotifications, mockNotifications, waitForChanges} from '../../utils/testUtils'
-import {MicroLcNotificationCenter} from './micro-lc-notification-center'
+import {LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
 
 const DEFAULT_NOCK_ENDPOINT = 'http://localhost'
 const NOTIFICATIONS = '/notifications'
@@ -30,7 +29,7 @@ const allNotifications = new AllNotifications(ALL, UNREAD)
  * @param limit pagination limit to DEFAULT_PAGINATION_LIMIT (= 10)
  * @returns nock scope
  */
-function init (status: 'ok' | 'nok' | 'count-nok' | 'disaster', skip = 0, limit = DEFAULT_PAGINATION_LIMIT): Notification[] | undefined {
+function init (status: 'ok' | 'nok' | 'count-nok' | 'disaster', skip = 0, limit = DEFAULT_PAGINATION_LIMIT): LocalizedNotification[] | undefined {
   const n = nock(DEFAULT_NOCK_ENDPOINT)
     .get(NOTIFICATIONS_FETCH)
     .query({skip, limit})
@@ -388,5 +387,27 @@ describe('micro-lc-notification-center lifecycle tests', () => {
     })
     const {done} = call(createElement)[1]
     expect(done).toBe(true)
+  })
+
+  it('should create intl notifications', async () => {
+    const {react: {createElement}} = sandboxMocks
+    const incomingNotifications = mockNotifications(DEFAULT_PAGINATION_LIMIT, true)
+    nock(DEFAULT_NOCK_ENDPOINT)
+      .get(NOTIFICATIONS_FETCH)
+      .query({skip: 0, limit: DEFAULT_PAGINATION_LIMIT})
+      .reply(200, incomingNotifications)
+    const page = await create({endpoint})
+
+    await waitForChanges(page, () => {
+      expect(nock.isDone()).toBe(true)
+    })
+    const {notifications} = call(createElement)[1]
+    expect(notifications).toEqual(incomingNotifications.map(({title, ...rest}) => {
+      if (typeof title === 'string') {
+        return {title, ...rest}
+      }
+
+      return {title: title.en, ...rest}
+    }))
   })
 })

@@ -1,7 +1,7 @@
 import {Component, Element, Prop, State, VNode} from '@stencil/core'
 
 import {NotificationCenter, Notification, NotificationCenterProps} from '../../lib'
-import {PartialTranslations} from '../../lib/utils/i18n.utils'
+import {LocalizedString, PartialTranslations} from '../../lib/utils/i18n.utils'
 import {DEFAULT_PAGINATION_LIMIT} from '../../utils/notificationsClient'
 import {reactRender, unmountComponentAtNode, Creatable, shadowRootCSS, disconnectedCallback, render} from '../engine'
 import {loadNotifications, onClick, onClickAll} from './micro-lc-notification-center.lib'
@@ -15,6 +15,19 @@ type Pagination = {
 
 export type MicroLcHeaders = Record<string, string>
 export type ClickStrategies = 'default' | 'href' | 'replace' | 'push'
+export type CallbackHref = {
+  kind: 'href' | string
+  content: string
+}
+export type LocalizedNotification = {
+  _id: string
+  creatorId: string
+  createdAt: string
+  title: LocalizedString
+  readState?: boolean
+  content?: LocalizedString
+  onClickCallback?: CallbackHref
+}
 
 /**
  * This is the micro-lc notification center web-component

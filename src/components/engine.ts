@@ -4,7 +4,6 @@ import {h, Host, VNode} from '@stencil/core'
 import ReactDOM from 'react-dom'
 
 import {setCssVariables} from '../utils/shadowRootCSS'
-import {MicroLcNotificationCenter} from './notification-center/micro-lc-notification-center'
 
 export interface Creatable<P = Record<string, never>> {
   wasDetached: boolean
@@ -40,13 +39,16 @@ function shadowRootCSS<P, T extends Creatable<P>> (this: T, id?: string): void {
   this.element.shadowRoot.appendChild(style)
 }
 
-function render (this: MicroLcNotificationCenter): VNode {
+function render<P = Record<string, never>, T extends Creatable<P> = Creatable<P>> (this: T): VNode {
   const host = h(Host, null, h('slot'))
   this.rerender()
   return host
 }
 
-function disconnectedCallback (this: MicroLcNotificationCenter): void {
+function disconnectedCallback<
+  P = Record<string, never>,
+  T extends Creatable<P> = Creatable<P>
+> (this: T): void {
   this.unmount()
 }
 
