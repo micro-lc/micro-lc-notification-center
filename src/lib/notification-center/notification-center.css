@@ -125,6 +125,7 @@
 
 .notification-item:hover {
   background-color: var(--ant-primary-1);
+  cursor: pointer;
 }
 
 .display-message {
