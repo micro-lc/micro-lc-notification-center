@@ -5,6 +5,7 @@
 [![Build Status][github-actions-svg]][github-actions]
 [![javascript style guide][standard-mia-svg]][standard-mia]
 [![Coverage Status][coverall-svg]][coverall-io]
+[![Mia-Platform](https://img.shields.io/badge/Supported%20by-Mia--Platform-green?style=for-the-badge&link=https://mia-platform.eu/&color=DE0D92&labelColor=214147)](https://mia-platform.eu/?utm_source=referral&utm_medium=github&utm_campaign=micro-lc)
 
 </div>
 
