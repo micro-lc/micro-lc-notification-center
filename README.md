@@ -29,6 +29,10 @@ comes with few customizable props
 |`limit`|`limit`|number|10|notification pagination limit|
 |`locales`| - |[PartialTranslations](#partial-translations)|{}|language locales and translations|
 |`clickStrategy`|`click-strategy`|[ClickStrategies](#click-strategies)|'default'|establishes what to do when a single notification is clicked|
+|`limitQueryParam`|`limit-query-param`|string|'limit'|string to use as query param as pagination limit param|
+|`skipQueryParam`|`skip-query-param`|string|'skip'|string to use as query param as pagination skip param|
+|`pushStateKey`|`push-state-key`|string|'micro-lc-notification-center'|it's the key used to scope the content callback context in window.history.state when clickStrategy is 'push'. Otherwise it is neglected|
+|`allowExternalHrefs`|`allow-external-hrefs`|string|'micro-lc-notification-center'|When true and clickStrategy is `default`, `href` or `replace`, notification links can browse to external web pages and href are not checked to ensure they are relative to self-website|
 
 ## partial translations
 
@@ -73,7 +77,7 @@ enum ClickStrategies =
 
 An on-click-strategy correspond to what happens when a notification is clicked.
 `default` and `href` do create an invisible `anchor` and click it, `replace`
-triggers `window.location.replace` while `push` pushes onto `window.history` stack.
+triggers `window.location.replace` while `push` pushes onto `window.history` state stack.
 
 # backend communication
 
