@@ -2,10 +2,10 @@ import {h} from '@stencil/core'
 import {newSpecPage, SpecPage} from '@stencil/core/testing'
 import nock from 'nock'
 
-import {JSX} from '../../components'
-import {DEFAULT_PAGINATION_LIMIT} from '../../utils/notificationsClient'
-import Sandbox, {AllNotifications, mockNotifications, waitForChanges} from '../../utils/testUtils'
-import {LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
+import {LocalizedNotification, MicroLcNotificationCenter} from '../micro-lc-notification-center'
+import {JSX} from '~/components'
+import {DEFAULT_PAGINATION_LIMIT} from '~/utils/notificationsClient'
+import Sandbox, {AllNotifications, mockNotifications, waitForChanges} from '~/utils/testUtils'
 
 const DEFAULT_NOCK_ENDPOINT = 'http://localhost'
 const NOTIFICATIONS = '/notifications'
@@ -17,8 +17,6 @@ const mocks = {react: ['createElement'], 'react-dom': ['render', 'unmountCompone
 const ALL = 99
 const UNREAD = 7
 const allNotifications = new AllNotifications(ALL, UNREAD)
-
-// jest.mock('../engine')
 
 /**
  * initializes a nock get mock to the first

@@ -1,7 +1,38 @@
 import type {Notification} from '../../lib'
 import {translate} from '../../lib/utils/i18n.utils'
-import {Counters, getCounts, getNotifications, patchAllReadState, patchReadState} from '../../utils/notificationsClient'
-import type {LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
+import {getLink} from './getLink'
+import type {ClickStrategies, LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
+import {Counters, getCounts, getNotifications, patchAllReadState, patchReadState} from '~/utils/notificationsClient'
+
+function handleClick (
+  clickStrategy: ClickStrategies,
+  pushStateKey: string,
+  content: string | Record<string, any>,
+  allowExternalHrefs = false
+): void {
+  if (clickStrategy === 'push') {
+    const {
+      state
+    } = window.history
+
+    window.history.pushState({...state, [pushStateKey]: content}, '')
+    return
+  }
+
+  if (typeof content === 'string') {
+    const link = getLink(content, allowExternalHrefs)
+    switch (clickStrategy) {
+      case 'replace':
+        window.location.replace(link.href)
+        break
+      case 'href':
+      case 'default':
+      default:
+        link.click()
+        break
+    }
+  }
+}
 
 function localizeNotifications (notifications: LocalizedNotification[]): Notification[] {
   return notifications.map(({title: incomingTitle, content: incomingContent, ...rest}) => {
@@ -36,7 +67,7 @@ function localizeNotifications (notifications: LocalizedNotification[]): Notific
 async function onClick (this: MicroLcNotificationCenter, {readState, ...rest}: Notification, index: number): Promise<void> {
   if (!readState) {
     const newReadState = !readState
-    return await patchReadState.bind(this)(rest._id, newReadState).then(() => {
+    await patchReadState.bind(this)(rest._id, newReadState).then(() => {
       this.notifications = [
         ...this.notifications.slice(0, index),
         {...rest, readState: newReadState},
@@ -44,6 +75,12 @@ async function onClick (this: MicroLcNotificationCenter, {readState, ...rest}: N
       ]
       this.unread--
     })
+  }
+
+  const {onClickCallback} = rest
+  const {clickStrategy, pushStateKey, allowExternalHrefs} = this
+  if (onClickCallback && onClickCallback.content) {
+    return handleClick(clickStrategy, pushStateKey, onClickCallback.content, allowExternalHrefs)
   }
 }
 

@@ -10,6 +10,10 @@ import { PartialTranslations } from "./lib/utils/i18n.utils";
 export namespace Components {
     interface MicroLcNotificationCenter {
         /**
+          * `allowExternalHrefs (optional) defaults to false. When true, notification links can browse to external web pages and href are not checked to ensure they are relative to self-website
+         */
+        "allowExternalHrefs": boolean;
+        /**
           * `clickStrategy` (optional) is an enum taking values 'default' | 'href' | 'replace' | 'push' which correspond to what happens when a notification is clicked. Default and href do create an `anchor` and click it. `replace` triggers the location replace while `push` pushes onto window.history stack
          */
         "clickStrategy": ClickStrategies;
@@ -26,9 +30,21 @@ export namespace Components {
          */
         "limit": number;
         /**
+          * `limitQueryParam (optional) defaults to 'limit' and it's the query parameter which controls notification pagination page size while fetching data
+         */
+        "limitQueryParam": string;
+        /**
           * `locales` (optional) is a key-value list to allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
          */
         "locales": PartialTranslations;
+        /**
+          * `pushStateKey (optional) defaults to 'micro-lc-notification-center' and it's the key used to scope the content callback context in window.history.state when clickStrategy is 'push'. Otherwise it is neglected
+         */
+        "pushStateKey": string;
+        /**
+          * `limitQueryParam (optional) defaults to 'limit' and it's the query parameter which controls notification pagination skip while fetching data
+         */
+        "skipQueryParam": string;
     }
 }
 declare global {
@@ -44,6 +60,10 @@ declare global {
 }
 declare namespace LocalJSX {
     interface MicroLcNotificationCenter {
+        /**
+          * `allowExternalHrefs (optional) defaults to false. When true, notification links can browse to external web pages and href are not checked to ensure they are relative to self-website
+         */
+        "allowExternalHrefs"?: boolean;
         /**
           * `clickStrategy` (optional) is an enum taking values 'default' | 'href' | 'replace' | 'push' which correspond to what happens when a notification is clicked. Default and href do create an `anchor` and click it. `replace` triggers the location replace while `push` pushes onto window.history stack
          */
@@ -61,9 +81,21 @@ declare namespace LocalJSX {
          */
         "limit"?: number;
         /**
+          * `limitQueryParam (optional) defaults to 'limit' and it's the query parameter which controls notification pagination page size while fetching data
+         */
+        "limitQueryParam"?: string;
+        /**
           * `locales` (optional) is a key-value list to allow i18n support. Keys are paired to either a string, which overrides language support or to a key-value map that matches a language to a translation  ```javascript const locales = {   title: 'A Title',   subtitle: {     en: 'A i18n subtitle',     'it-IT': 'Un sottotitolo internazionalizzato'   } } ```
          */
         "locales"?: PartialTranslations;
+        /**
+          * `pushStateKey (optional) defaults to 'micro-lc-notification-center' and it's the key used to scope the content callback context in window.history.state when clickStrategy is 'push'. Otherwise it is neglected
+         */
+        "pushStateKey"?: string;
+        /**
+          * `limitQueryParam (optional) defaults to 'limit' and it's the query parameter which controls notification pagination skip while fetching data
+         */
+        "skipQueryParam"?: string;
     }
     interface IntrinsicElements {
         "micro-lc-notification-center": MicroLcNotificationCenter;

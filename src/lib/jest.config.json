@@ -19,7 +19,7 @@
     "utils/**/*.ts",
     "notification-center/**/*.tsx",
     "notification-center/**/*.ts",
-    "!utils/test.utils.ts"
+    "!utils/testUtils.ts"
   ],
   "coverageDirectory": "../../coverage/react"
 }

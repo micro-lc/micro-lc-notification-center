@@ -16,8 +16,7 @@ type ReadStateHandler = (notification: Notification, index: number) => Promise<v
 type AllReadStateHandler = () => Promise<number>
 
 export type CallbackHref = {
-  kind: 'href' | string
-  content: string
+  content: string | Record<string, any>
 }
 
 export type Notification = {

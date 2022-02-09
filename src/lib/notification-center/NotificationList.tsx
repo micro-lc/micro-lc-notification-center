@@ -3,34 +3,12 @@ import React, {ReactElement, useCallback, useMemo} from 'react'
 import {Typography} from 'antd'
 
 import {useLocale} from '../utils/i18n.utils'
-import {getLink} from '../utils/url.utils'
-import {NotificationCenterProps, Notification} from './NotificationCenter'
+import type {NotificationCenterProps} from './NotificationCenter'
 import NotificationEntry from './NotificationEntry'
 
 const {Text} = Typography
 
 export type NotificationsListProps = Omit<NotificationCenterProps, 'locales' | 'reload' | 'onClickAll'>
-
-function handleClick (onClick: NotificationsListProps['onClick'], notification: Notification, i: number, clickStrategy: NotificationsListProps['clickStrategy']): () => Promise<void> {
-  return async () => {
-    const link = getLink(notification)
-    await onClick(notification, i).finally(() => {
-      switch (clickStrategy) {
-        case 'replace':
-          window.location.replace(link.href)
-          break
-        case 'push':
-          window.history.pushState({}, '', link.href)
-          break
-        case 'href':
-        case 'default':
-        default:
-          link.click()
-          break
-      }
-    })
-  }
-}
 
 export default function NotificationsList ({
   error,
@@ -38,8 +16,7 @@ export default function NotificationsList ({
   loading,
   onClick,
   next,
-  notifications,
-  clickStrategy
+  notifications
 }: NotificationsListProps): ReactElement {
   const {t} = useLocale()
 
@@ -56,7 +33,7 @@ export default function NotificationsList ({
       {notifications.map((notification, i) => (
           <NotificationEntry
             key={i}
-            onClick={handleClick(onClick, notification, i, clickStrategy)}
+            onClick={() => onClick(notification, i)}
             {...notification}
           />
       ))}

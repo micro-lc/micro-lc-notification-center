@@ -21,9 +21,16 @@ export enum Routes {
 const DEFAULT_PAGINATION_LIMIT = 10
 
 async function getNotifications (this: MicroLcNotificationCenter, skip: number): Promise<Notification[]> {
-  const {data} = await axios.get<Notification[]>(`${this.endpoint}${Routes.Fetch}`, {
-    headers: this.headers,
-    params: {skip, limit: this.limit},
+  const {
+    endpoint,
+    headers,
+    limit,
+    skipQueryParam,
+    limitQueryParam
+  } = this
+  const {data} = await axios.get<Notification[]>(`${endpoint}${Routes.Fetch}`, {
+    headers: headers,
+    params: {[skipQueryParam]: skip, [limitQueryParam]: limit},
     responseType: 'json'
   })
   return data

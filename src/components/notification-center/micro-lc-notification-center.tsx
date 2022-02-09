@@ -16,8 +16,7 @@ type Pagination = {
 export type MicroLcHeaders = Record<string, string>
 export type ClickStrategies = 'default' | 'href' | 'replace' | 'push'
 export type CallbackHref = {
-  kind: 'href' | string
-  content: string
+  content: string | Record<string, any>
 }
 export type LocalizedNotification = {
   _id: string
@@ -90,6 +89,35 @@ export class MicroLcNotificationCenter implements Creatable<NotificationCenterPr
    * while `push` pushes onto window.history stack
    */
   @Prop() clickStrategy: ClickStrategies = 'default'
+
+  /**
+   * `limitQueryParam (optional)
+   * defaults to 'limit' and it's the query parameter which controls
+   * notification pagination page size while fetching data
+   */
+  @Prop() limitQueryParam = 'limit'
+
+  /**
+   * `limitQueryParam (optional)
+   * defaults to 'limit' and it's the query parameter which controls
+   * notification pagination skip while fetching data
+   */
+  @Prop() skipQueryParam = 'skip'
+
+  /**
+   * `pushStateKey (optional)
+   * defaults to 'micro-lc-notification-center' and it's the key used
+   * to scope the content callback context in window.history.state when clickStrategy
+   * is 'push'. Otherwise it is neglected
+   */
+  @Prop() pushStateKey = 'micro-lc-notification-center'
+
+  /**
+   * `allowExternalHrefs (optional)
+   * defaults to false. When true, notification links can browse to external web pages
+   * and href are not checked to ensure they are relative to self-website
+   */
+  @Prop() allowExternalHrefs = false
 
   @State() notifications: Notification[] = []
   @State() loading?: boolean

@@ -50,8 +50,7 @@ const mockNotifications = (quantity) => Array(quantity).fill(0).map(() => ({
   title: ['Email', {en: 'Appointment', it: 'Appuntamento'}, {en: 'Notification', it: 'Notifica'}, {en: 'Scheduled meeting', it: 'Appuntamento schedulato'}][randomNumber(0, 4)],
   content: contentGenerator(),
   onClickCallback: {
-    kind: 'href',
-    content: `?_q=${randomString(5)}`
+    content: `http://www.google.com?_q=${randomString(5)}`
   }
 }))
 
