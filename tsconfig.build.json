@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "exclude": ["src/index.min.ts", "src/**/__tests__"],
+  "compilerOptions": {
+    "declaration": false,
+    "emitDeclarationOnly": false
+  },
+  "include": [
+    "node_modules/construct-style-sheets-polyfill/dist/adoptedStyleSheets.d.ts"
+  ]
+}

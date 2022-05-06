@@ -3,26 +3,22 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "allowUnreachableCode": false,
-    "declaration": false,
     "experimentalDecorators": true,
-    "lib": [
-      "dom",
-      "esnext"
-    ],
+    "lib": ["DOM", "ESNext"],
     "strictBindCallApply": true,
     "moduleResolution": "node",
-    "module": "esnext",
-    "target": "es2017",
+    "module": "ESNext",
+    "target": "ES2015",
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "skipDefaultLibCheck": true,
     "jsx": "react",
-    "sourceMap": true
+    "jsxFactory": "React.createElement",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ln/*": ["./node_modules/dayjs/locale/*"]
+    }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src"]
 }

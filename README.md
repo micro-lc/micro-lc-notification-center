@@ -11,7 +11,9 @@
 
 This [micro-lc][micro-lc] plugin enables you to handle notifications in your application.
 
-This plugin is in fact a web-component which can be embedded in any html page or within micro-lc. It works by dealing
+This plugin is in fact a web-component which can be
+embedded in any html page or within micro-lc.
+It works by dealing
 with a backend source with a simple REST API interface.
 
 The webcomponent
@@ -191,21 +193,65 @@ yarn install
 ```
 
 If you'd like to test this notification center on your local machine, after installing,
-you'll find a tiny backend notification mock server which handles you some data to start your component visualization mode and further allows to better
+you'll find a tiny backend notification mock server which handles some data to your frontend and further allows to better
 asses the notification API. The backend can be started by using
 
 ```shell
-yarn start:be
+yarn start:server
 ```
 
-[Stencil](https://stenciljs.com/) provides a simple frontend server which serves a simple html page containing a navbar + this repo's `micro-lc-notification-center`.
-To open just run
+You can start your frontend in 2 different ways
+
+1. `viteJS` development mode which servers typescript source files ready for transpilation
+2. using the minified library pack
+
+For the former case, just run
 
 ```shell
 yarn start
 ```
 
-and, if not automatically prompted, navigate to <http://localhost:3333>
+which serves `./index.html` on `localhost:3000`.
+
+The latter requires building the library and a corresponding docker container
+
+```shell
+yarn build:unpkg
+
+export IMAGE_NAME=micro-lc-notification-center
+docker build --tag $IMAGE_NAME .
+```
+
+and then deploying
+
+```shell
+export CONTAINER_NAME=notification-center
+docker run -d -p 3000:8080 --name $CONTAINER_NAME $IMAGE_NAME
+```
+
+feel free to edit both variables at will. A sample webpage will be available at `http://localhost:3000`.
+
+## build
+
+The repository emits:
+
+1. ES Module
+2. CommonJS
+3. TS Types
+4. Minified ES Module library with [`adoptedStyleSheet`](https://caniuse.com/mdn-api_document_adoptedstylesheets) polyfills (needed by Firefox and Safari)
+
+libraries are built by the idiomatic scripts
+
+1. ```yarn build:es```
+2. ```yarn build:cjs```
+3. ```yarn build:types```
+4. ```yarn build:unpkg```
+
+An overall parallel script to run them all is available as
+
+```shell
+yarn build
+```
 
 [micro-lc]: https://github.com/micro-lc/micro-lc
 [standard-mia-svg]: https://img.shields.io/badge/code_style-standard--mia-orange.svg
