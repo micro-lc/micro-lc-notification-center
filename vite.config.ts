@@ -41,11 +41,6 @@ export default defineConfig({
           engine: ['react', 'react-dom', 'lit'],
           antd: ['antd/es', '@ant-design/colors', '@ant-design/icons/es/icons'],
           index: ['src/index.min.ts']
-          // antd: ['antd', '@ant-design/colors', 'tinycolor2'],
-          // fontawesome: ['@fortawesome/react-fontawesome'],
-          // 'dynamic-icons': ['../back-kit/lib/utils/dynamic-icon.js'],
-          // index: ['src/index.lit.bk.ts'],
-          // 'csv-stringify': ['csv-stringify/browser/esm/sync']
         }
       }
     },

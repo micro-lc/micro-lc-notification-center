@@ -1,4 +1,4 @@
-import React, {ReactElement, useState} from 'react'
+import React, {ReactElement, useCallback, useEffect, useState} from 'react'
 
 import {BellOutlined} from '@ant-design/icons/es/icons'
 import Popover from 'antd/es/popover'
@@ -63,7 +63,18 @@ export function NotificationCenter({
   unread,
   ...rest
 }: NotificationCenterProps): ReactElement {
+  const [clickOutside, setClickOutside] = useState(false)
   const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    if(clickOutside) {
+      const t = setTimeout(() => {
+        setClickOutside(false)
+      }, 200)
+
+      return () => clearTimeout(t)
+    }
+  }, [clickOutside])
 
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
@@ -82,6 +93,7 @@ export function NotificationCenter({
         }
         getPopupContainer={(node) => node}
         onVisibleChange={(v) => {
+          setClickOutside(true)
           !v && setVisible(v)
         }}
         placement="bottomRight"
@@ -106,9 +118,7 @@ export function NotificationCenter({
             type="button"
             className="ant-btn ant-btn-circle ant-btn-primary"
             style={{color: 'white', padding: 'initial'}}
-            onClick={() => {
-              setVisible((t) => !t)
-            }}
+            onClick={() => {!clickOutside && setVisible(t => !t)}}
           >
             <BellOutlined />
           </button>

@@ -31,6 +31,11 @@ comes with few customizable props
 |`limit`|`limit`|number|10|notification pagination limit|
 |`locales`| - |[PartialTranslations](#partial-translations)|{}|language locales and translations|
 |`clickStrategy`|`click-strategy`|[ClickStrategies](#click-strategies)|'default'|establishes what to do when a single notification is clicked|
+|`limitQueryParam`|`limit-query-param`|string|'limit'|string to use as query param as pagination limit param|
+|`skipQueryParam`|`skip-query-param`|string|'skip'|string to use as query param as pagination skip param|
+|`pushStateKey`|`push-state-key`|string|'micro-lc-notification-center'|it's the key used to scope the content callback context in window.history.state when clickStrategy is 'push'. Otherwise it is neglected|
+|`allowExternalHrefs`|`allow-external-hrefs`|string|'micro-lc-notification-center'|When true and clickStrategy is `default`, `href` or `replace`, notification links can browse to external web pages and href are not checked to ensure they are relative to self-website|
+|`mode`|`mode`|string|'default'|TODO|
 
 ## partial translations
 
@@ -87,20 +92,31 @@ the endpoints called by the component that should be exposed by the service.
 This endpoint should return the list of paged notifications that the currently logged-in user should visualize. The notifications
 should be ordered by creation date descending.
 
-### Query
+### Query Parameters
+
+Query parameters `size` and `limit` helps querying the notification pagination. While the optional parameter `lang` allows to
+communicate to the server which translation to serve. The interface still accepts a `LocalizedText` even if `lang` is specified
 
 ```json
 {
-  "limit": {
-    "description": "Limits the number of documents, max 200 elements, minimum 1",
-    "type": "integer",
-    "minimum": 1
+  "type": "object",
+  "properties": {
+    "limit": {
+      "description": "Limits the number of documents, max 200 elements, minimum 1",
+      "type": "integer",
+      "minimum": 1
+    },
+    "skip": {
+      "description": "Skip the specified number of documents",
+      "type": "integer",
+      "minimum": 0
+    },
+    "lang": {
+      "description": "a language code meta like `en` or `zh`",
+      "type": "string"
+    }
   },
-  "skip": {
-    "description": "Skip the specified number of documents",
-    "type": "integer",
-    "minimum": 0
-  }
+  "required": ["skip", "limit"]
 }
 ```
 
