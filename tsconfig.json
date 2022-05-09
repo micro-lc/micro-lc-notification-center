@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "allowJs": true,
+    "noEmit": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -9,8 +11,6 @@
     "moduleResolution": "node",
     "module": "ESNext",
     "target": "ES2015",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
     "skipDefaultLibCheck": true,
     "jsx": "react",
     "jsxFactory": "React.createElement",
@@ -20,5 +20,5 @@
       "@ln/*": ["./node_modules/dayjs/locale/*"]
     }
   },
-  "include": ["src"]
+  "exclude": ["node_modules"]
 }

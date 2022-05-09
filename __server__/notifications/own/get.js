@@ -1,6 +1,7 @@
 const {notifications} = require('../notifications')
 
 module.exports = (request, response) => {
+  response.header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0')
   const {query} = request
   if (query && query.skip && query.limit) {
     const skip = Number.parseInt(query.skip)
@@ -26,13 +27,29 @@ module.exports = (request, response) => {
         message: '`limit` must be a non-negative integer number',
       })
     } else {
+      const {lang} = query
       response
         .set({
           'Content-Type': 'application/json',
           'Cache-Control': 'no-cache',
         })
         .status(200)
-        .send(notifications.slice(skip, skip + limit))
+        .send(notifications.slice(skip, skip + limit).map((n) => {
+          if(lang) {
+            const translated = {...n}
+            const {title, content} = n
+            if(title[lang]) {
+              translated.title = title[lang]
+            }
+            if(content[lang]) {
+              translated.content = content[lang]
+            }
+
+            return translated
+          }
+          
+          return n
+        }))
     }
     return
   }

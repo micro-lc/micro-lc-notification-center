@@ -10,7 +10,12 @@ import {getLink} from '../utils/url'
 export type NotificationsListProps = Omit<
   NotificationCenterProps,
   'locales' | 'reload' | 'onClickAll'
->;
+>
+
+const makeitButton = (ref?: HTMLElement) => {
+  ref?.setAttribute('role', 'button')
+  ref?.setAttribute('tabindex', '0')
+}
 
 function handleClick(
   onClick: NotificationsListProps['onClick'],
@@ -57,6 +62,7 @@ export default function NotificationsList({
     () =>
       done ? (
         <Typography.Text
+          ref={makeitButton}
           className="notification-button"
           disabled={loading}
           onClick={handleBackOnTop}
@@ -66,6 +72,7 @@ export default function NotificationsList({
         </Typography.Text>
       ) : (
         <Typography.Text
+          ref={makeitButton}
           className="notification-button"
           disabled={loading}
           onClick={next}
@@ -99,9 +106,7 @@ export default function NotificationsList({
         <Typography.Text className="display-message">{t('noNotification')}</Typography.Text>
       )}
       <div
-        role="button"
         style={{textAlign: 'center', marginBottom: '5px'}}
-        tabIndex={0}
       >
         {renderFooter()}
       </div>

@@ -17,7 +17,7 @@ export enum Routes {
 }
 
 export type HttpClient = {
-  getNotifications(skip: number): Promise<Notification[]>
+  getNotifications(skip: number, lang?: string): Promise<Notification[]>
   getCounts(): Promise<Counters>
   patchReadState(_id: string, readState?: boolean): Promise<void>
   patchAllReadState(): Promise<number | void>
@@ -43,10 +43,12 @@ function responseHandler<T = Record<string, any>>(res: Response): Promise<T | vo
 
 export function createClient (this: MicroLcNotificationCenter) {
   return {
-    getNotifications: async (skip: number): Promise<Notification[]> => {
+    getNotifications: async (skip: number, lang?: string): Promise<Notification[]> => {
       const url = new URL(`${this.endpoint}${Routes.Fetch}`)
       url.searchParams.set('skip', `${skip}`)
       url.searchParams.set('limit', `${this.limit}`)
+      lang && url.searchParams.set('lang', lang)
+      
       return fetch(url.href, {method: 'GET', headers: {...this.headers}})
         .then((res) => responseHandler(res) as Promise<Notification[]>)
     },

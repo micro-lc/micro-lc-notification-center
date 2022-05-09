@@ -44,7 +44,6 @@ lerna-debug.log
 *~
 *.sw[mnpcod]
 *.log
-*.lock
 *.tmp
 *.tmp.*
 log.txt

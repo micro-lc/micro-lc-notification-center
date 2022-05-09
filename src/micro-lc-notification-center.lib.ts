@@ -2,6 +2,7 @@ import type {Notification, NotificationCenterProps} from './react-components'
 import {translate} from './utils/i18n'
 import type {LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
 import {HttpClient} from './utils/client'
+import {getLang} from './locale'
 
 function localizeNotifications (notifications: LocalizedNotification[]): Notification[] {
   return notifications.map(({title: incomingTitle, content: incomingContent, ...rest}) => {
@@ -79,32 +80,36 @@ export async function loadNotifications (this: MicroLcNotificationCenter, client
   const skip = reload ? 0 : this.page.skip
   this.loading = true
   this.done = false
+
+  const lang = getLang()
+
   Promise.allSettled([
-    client.getNotifications(skip),
+    client.getNotifications(skip, lang),
     client.getCounts()
-  ]).then(([notRes, countsRes]) => {
-    if (notRes.status === 'fulfilled') {
-      const notifications = localizeNotifications(notRes.value)
-      this.error = false
-      this.notifications = reload ? notifications : [...this.notifications, ...notifications]
-      this.page = {skip: skip + this.limit, last: skip}
+  ]).then(
+    ([notRes, countsRes]) => {
+      if (notRes.status === 'fulfilled') {
+        const notifications = localizeNotifications(notRes.value)
+        this.error = false
+        this.notifications = reload ? notifications : [...this.notifications, ...notifications]
+        this.page = {skip: skip + this.limit, last: skip}
 
-      if (notifications.length === 0 || notifications.length < this.limit) {
-        this.done = true
+        if (notifications.length === 0 || notifications.length < this.limit) {
+          this.done = true
+        }
+      } else if (notRes.status === 'rejected') {
+        this.error = true
       }
-    } else if (notRes.status === 'rejected') {
-      this.error = true
-    }
 
-    if (countsRes.status === 'fulfilled') {
-      const {count, unread} = countsRes.value
-      this.count = count
-      this.unread = unread
-      if (count !== undefined && this.notifications.length === count) {
-        this.done = true
+      if (countsRes.status === 'fulfilled') {
+        const {count, unread} = countsRes.value
+        this.count = count
+        this.unread = unread
+        if (count !== undefined && this.notifications.length === count) {
+          this.done = true
+        }
       }
-    }
-  }).finally(() => {
+    }).finally(() => {
     this.loading = false
   })
 }

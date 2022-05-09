@@ -148,15 +148,20 @@ export const supportedLocales = [
   'zh-tw'
 ]
 
-export function loadLocale () {
+export function getLang (nav = window.navigator): string {
   let lang = DEFAULT_LANGUAGE
 
-  if(supportedLocales.includes(navigator.language)) {
-    lang = navigator.language
-  } else if (supportedLocales.includes(navigator.language.substring(0, 2))) {
-    lang = navigator.language.substring(0, 2)
+  if(supportedLocales.includes(nav.language)) {
+    lang = nav.language
+  } else if (supportedLocales.includes(nav.language.substring(0, 2))) {
+    lang = nav.language.substring(0, 2)
   }
 
+  return lang
+}
+
+export function loadLocale () {
+  const lang = getLang()
   
   import(`@ln/${lang}.js`).then(() => dayjs.locale(lang))
 }

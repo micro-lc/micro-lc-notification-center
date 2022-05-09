@@ -133,8 +133,12 @@
 
 .notification-date {
   display: block;
-  color: rgb(142 142 142) !important;
+  color: @text-color-secondary;
   font-size: 11px;
+
+  &.notification-hovered {
+    color: @text-color-inverse;
+  }
 }
 
 .notification-item {
@@ -142,7 +146,7 @@
   border-radius: 8px;
 
   &:hover {
-    background-color: @primary-color-hover;
+    background-color: @primary-1;
     cursor: pointer;
   }
 }

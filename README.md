@@ -220,14 +220,28 @@ yarn build:unpkg
 
 export IMAGE_NAME=micro-lc-notification-center
 docker build --tag $IMAGE_NAME .
+
+## or instead
+
+yarn docker:build
 ```
+
+where the latter is recommended if the default image name is fine for
+your local machine
 
 and then deploying
 
 ```shell
 export CONTAINER_NAME=notification-center
 docker run -d -p 3000:8080 --name $CONTAINER_NAME $IMAGE_NAME
+
+## or 
+
+yarn docker:run [<container_name>]
 ```
+
+where the latter is recommended if you kept the default image name. The
+container name defaults to `nc` and can be omitted.
 
 feel free to edit both variables at will. A sample webpage will be available at `http://localhost:3000`.
 

@@ -67,9 +67,6 @@ export function NotificationCenter({
   ...rest
 }: NotificationCenterProps): ReactElement {
   const [visible, setVisible] = useState(false)
-  useEffect(() => {
-    console.log(visible)
-  }, [visible])
 
   return (
     <I18n.Provider value={{defaultTranslations, locales}}>
@@ -80,6 +77,7 @@ export function NotificationCenter({
           <NotificationsList
             loading={loading}
             onClick={async (notification, index) => {
+              console.log('list', false)
               setVisible(false)
               return onClick(notification, index)
             }}
@@ -88,7 +86,8 @@ export function NotificationCenter({
         }
         getPopupContainer={(node) => node}
         onVisibleChange={(v) => {
-          setVisible(v)
+          !v && console.log('visible-change', v)
+          !v && setVisible(v)
         }}
         placement="bottomRight"
         title={
@@ -113,7 +112,10 @@ export function NotificationCenter({
             className="ant-btn ant-btn-circle ant-btn-primary"
             style={{color: 'white', padding: 'initial'}}
             onClick={() => {
-              setVisible((t) => !t)
+              setVisible((t) => {
+                console.log('button', !t)
+                return !t
+              })
             }}
           >
             <BellOutlined />

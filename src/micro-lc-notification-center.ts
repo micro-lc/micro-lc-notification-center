@@ -14,6 +14,7 @@ import {createProps, loadNotifications} from './micro-lc-notification-center.lib
 import {createClient} from './utils/client'
 import type {FunctionComponent} from 'react'
 import {decorateRoot, shadowRootCSS} from './utils/style'
+import Subscription from './utils/Subscription'
 
 const DEFAULT_MICRO_LC_NOTIFICATION_ENDPOINT = '/api/v1/micro-lc-notification-center'
 
@@ -37,6 +38,7 @@ export type LocalizedNotification = {
   content?: LocalizedString
   onClickCallback?: CallbackHref
 }
+export type ResourceFetchingMode = 'default' | 'none' | 'polling' | 'long-polling' | 'websocket'
 
 /**
  * This is the micro-lc notification center web-component
@@ -103,7 +105,9 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
    * an `anchor` and click it. `replace` triggers the location replace
    * while `push` pushes onto window.history stack
    */
-  @property({type: String, attribute: 'click-strategy'}) clickStrategy: ClickStrategies = 'default'
+  @property({attribute: 'click-strategy'}) clickStrategy: ClickStrategies = 'default'
+
+  @property() mode: ResourceFetchingMode = 'default'
 
   @state() notifications: Notification[] = []
   @state() loading?: boolean
@@ -116,6 +120,7 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
   @query('#root-div') rootDiv!: HTMLDivElement
   
   private _shouldRenderWhenConnected = false
+  protected subscription = new Subscription()
   protected httpClient!: HttpClient
 
   /**
@@ -131,17 +136,32 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
   /**
    * webcomponents lifecycle
    */
-  protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    super.firstUpdated(_changedProperties)
-    const httpClient = createClient.call(this)
-    loadNotifications.call(this, httpClient, false)
-
-    this.httpClient = httpClient
+  connectedCallback(): void {
+    if (this._shouldRenderWhenConnected) {
+      reactRender.call(this, this.rootDiv)
+      this._shouldRenderWhenConnected = false
+    }
+    super.connectedCallback()
     
+    if(this.subscription.closed) {
+      this.subscription = new Subscription()
+    }
+  }
+
+  protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
     decorateRoot.call(this, [
       shadowRootCSS(this.shadowRoot?.ownerDocument),
       style
     ])
+
+    super.firstUpdated(_changedProperties)
+    const httpClient = createClient.call(this)
+    loadNotifications.call(this, httpClient, false)
+
+    if(!['default', 'none'].includes(this.mode)) {
+      // TODO
+    }
+    this.httpClient = httpClient
   }
 
   protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -153,17 +173,10 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
     return html`<div id="root-div"></div>`
   }
   
-  connectedCallback(): void {
-    if (this._shouldRenderWhenConnected) {
-      reactRender.call(this, this.rootDiv)
-      this._shouldRenderWhenConnected = false
-    }
-    super.connectedCallback()
-  }
-
   disconnectedCallback(): void {
     unmount.call(this)
     this._shouldRenderWhenConnected = true
+    this.subscription.unsubscribe()
     super.disconnectedCallback()
   }
 }

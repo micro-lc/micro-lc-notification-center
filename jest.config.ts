@@ -23,15 +23,7 @@ const jestConfig = {
   },
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.[jt]sx?$': [
-      'esbuild-jest',
-      {
-        sourcemap: true,
-        loaders: {
-          '.test.ts': 'tsx',
-        }
-      }
-    ]
+    '\\.[jt]sx?$': 'ts-jest'
   },
   testRegex: '(/__tests__/.*|\\.(test|spec))\\.(ts|tsx)$',
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
@@ -39,7 +31,7 @@ const jestConfig = {
     'node_modules/(?!(@open-wc|@lit|lit|lit-html|lit-element)/)'
   ],
   setupFilesAfterEnv: [
-    './__tests__/testSetup.ts'
+    './src/testSetup.ts'
   ]
 }
 
