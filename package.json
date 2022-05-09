@@ -9,8 +9,7 @@
   "types": "dist/types/index.d.ts",
   "unpkg": "dist/unpkg/micro-lc-notification-center.esm.js",
   "files": [
-    "dist/",
-    "loader/"
+    "dist/"
   ],
   "packageManager": "yarn@3.2.0",
   "repository": {
@@ -34,13 +33,13 @@
     "start": "vite",
     "test": "echo 'TODO jest'",
     "coverage": "echo 'TODO jest --coverage'",
-    "docs": "ts-node -O '{\"module\":\"commonjs\"}' plugins/typedoc",
     "docker:build": "./scripts/build.sh",
     "docker:run": "./scripts/run.sh"
   },
   "dependencies": {
     "@ant-design/colors": "^6.0.0",
     "@ant-design/icons": "^4.7.0",
+    "@braintree/sanitize-url": "^6.0.0",
     "antd": "^4.20.2",
     "dayjs": "^1.11.1",
     "lit": "^2.2.3",

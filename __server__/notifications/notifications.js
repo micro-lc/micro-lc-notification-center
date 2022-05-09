@@ -129,8 +129,10 @@ const mockNotifications = (quantity) =>
       ][randomNumber(0, 4)],
       content: contentGenerator(),
       onClickCallback: {
-        kind: 'href',
-        content: `?_q=${randomString(5)}`,
+        content: {
+          data: {'key': randomString()},
+          url: `/?_q=${randomString()}`
+        }
       },
     }))
 

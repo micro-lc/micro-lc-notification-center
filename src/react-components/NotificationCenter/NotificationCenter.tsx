@@ -1,10 +1,9 @@
-import React, {ReactElement, useEffect, useState} from 'react'
+import React, {ReactElement, useState} from 'react'
 
 import {BellOutlined} from '@ant-design/icons/es/icons'
 import Popover from 'antd/es/popover'
 import Badge from 'antd/es/badge'
 
-import type {ClickStrategies} from '../../micro-lc-notification-center'
 import {I18n, DefaultTranslations, PartialTranslations} from '../utils/i18n'
 import NotificationsList from './NotificationList'
 import PopupTitle from './PopupTitle'
@@ -17,8 +16,7 @@ type ReadStateHandler = (
 type AllReadStateHandler = () => Promise<void | number>;
 
 export type CallbackHref = {
-  kind: 'href' | string;
-  content: string;
+  content: string | Record<string, any>;
 };
 
 export type Notification = {
@@ -43,7 +41,6 @@ export type NotificationCenterProps = {
   onClickAll: AllReadStateHandler;
   count?: number;
   unread?: number;
-  clickStrategy: ClickStrategies;
 };
 
 export const defaultTranslations: DefaultTranslations = {
@@ -77,7 +74,6 @@ export function NotificationCenter({
           <NotificationsList
             loading={loading}
             onClick={async (notification, index) => {
-              console.log('list', false)
               setVisible(false)
               return onClick(notification, index)
             }}
@@ -86,7 +82,6 @@ export function NotificationCenter({
         }
         getPopupContainer={(node) => node}
         onVisibleChange={(v) => {
-          !v && console.log('visible-change', v)
           !v && setVisible(v)
         }}
         placement="bottomRight"
@@ -112,10 +107,7 @@ export function NotificationCenter({
             className="ant-btn ant-btn-circle ant-btn-primary"
             style={{color: 'white', padding: 'initial'}}
             onClick={() => {
-              setVisible((t) => {
-                console.log('button', !t)
-                return !t
-              })
+              setVisible((t) => !t)
             }}
           >
             <BellOutlined />

@@ -26,8 +26,7 @@ type Pagination = {
 export type MicroLcHeaders = Record<string, string>
 export type ClickStrategies = 'default' | 'href' | 'replace' | 'push'
 export type CallbackHref = {
-  kind: 'href' | string
-  content: string
+  content: string | Record<string, any>
 }
 export type LocalizedNotification = {
   _id: string
@@ -106,7 +105,37 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
    * while `push` pushes onto window.history stack
    */
   @property({attribute: 'click-strategy'}) clickStrategy: ClickStrategies = 'default'
+  
+  /**
+   * `limitQueryParam (optional)
+   * defaults to 'limit' and it's the query parameter which controls
+   * notification pagination page size while fetching data
+   */
+  @property({attribute: 'limit-query-param'}) limitQueryParam = 'limit'
 
+  /**
+   * `limitQueryParam (optional)
+   * defaults to 'limit' and it's the query parameter which controls
+   * notification pagination skip while fetching data
+   */
+  @property({attribute: 'skip-query-param'}) skipQueryParam = 'skip'
+
+  /**
+   * `pushStateKey (optional)
+   * defaults to 'micro-lc-notification-center' and it's the key used
+   * to scope the content callback context in window.history.state when clickStrategy
+   * is 'push'. Otherwise it is neglected
+   */
+  @property({attribute: 'push-state-key'}) pushStateKey = 'micro-lc-notification-center'
+
+  /**
+   * `allowExternalHrefs (optional)
+   * defaults to false. When true, notification links can browse to external web pages
+   * and href are not checked to ensure they are relative to self-website
+   */
+  @property({type: Boolean, attribute: 'allow-external-hrefs'}) allowExternalHrefs = false
+
+  // TODO
   @property() mode: ResourceFetchingMode = 'default'
 
   @state() notifications: Notification[] = []

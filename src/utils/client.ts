@@ -41,33 +41,67 @@ function responseHandler<T = Record<string, any>>(res: Response): Promise<T | vo
   return Promise.reject(res)
 }
 
+function ensureSlash(s: string): string {
+  return s.charAt(0) === '/' ? s : '/' + s
+}
+
+function resolveEndpoint(this: MicroLcNotificationCenter, subpath: string, searchParams: Record<string, string> = {}): string {
+  const {
+    endpoint
+  } = this
+
+  // check whether endpoint is relative or absolute
+  let e = endpoint
+  if(!endpoint.match(/^(?:[a-z]+:)?\/\//i)) {
+    e = `${window.location.origin}${ensureSlash(endpoint)}`
+  }
+
+  // check trailing slash
+  const base = e.replace(/\/$/, '')
+  const spath = ensureSlash(subpath)
+  
+  // build URL
+  const url = new URL(`${base}${spath}`)
+  Object.entries(searchParams).forEach(([k, v]) => {
+    url.searchParams.set(k, v)
+  })
+
+  return url.href
+}
+
 export function createClient (this: MicroLcNotificationCenter) {
   return {
     getNotifications: async (skip: number, lang?: string): Promise<Notification[]> => {
-      const url = new URL(`${this.endpoint}${Routes.Fetch}`)
-      url.searchParams.set('skip', `${skip}`)
-      url.searchParams.set('limit', `${this.limit}`)
-      lang && url.searchParams.set('lang', lang)
-      
-      return fetch(url.href, {method: 'GET', headers: {...this.headers}})
+      const {
+        headers,
+        limit,
+        skipQueryParam,
+        limitQueryParam
+      } = this
+
+      const url = resolveEndpoint.call(this, `${Routes.Fetch}`, {[skipQueryParam]: `${skip}`, [limitQueryParam]: `${limit}`, lang})
+      return await fetch(url, {method: 'GET', headers: {...headers}})
         .then((res) => responseHandler(res) as Promise<Notification[]>)
     },
     getCounts: async (): Promise<Counters> => {
-      return fetch(`${this.endpoint}${Routes.Count}`, {method: 'GET', headers: this.headers})
+      const url = resolveEndpoint.call(this, `${Routes.Count}`)
+      return await fetch(url, {method: 'GET', headers: this.headers})
         .then((res) => responseHandler(res) as Promise<Counters>)
     },
     patchReadState: async (_id: string, readState = true): Promise<void> => {
       if (!_id) {
         throw new Error('`_id` cannot be undefined or an empty string')
       }
-      return fetch(`${this.endpoint}${Routes.SetRead}/${_id}`, {
+      const url = resolveEndpoint.call(this, `${Routes.SetRead}/${_id}`)
+      return await fetch(url, {
         method: 'PATCH',
         body: JSON.stringify({readState}),
         headers: {'Content-Type': 'application/json', ...this.headers}
       }).then((res) => responseHandler(res) as Promise<void>)
     },
     patchAllReadState: async (): Promise<number | void> => {
-      return fetch(`${this.endpoint}${Routes.SetRead}${Routes.Fetch}`, {
+      const url = resolveEndpoint.call(this, `${Routes.SetRead}${Routes.Fetch}`)
+      return await fetch(url, {
         method: 'PATCH',
         body: JSON.stringify({readState: true}),
         headers: {'Content-Type': 'application/json', ...this.headers}

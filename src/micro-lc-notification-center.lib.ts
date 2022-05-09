@@ -1,8 +1,53 @@
 import type {Notification, NotificationCenterProps} from './react-components'
 import {translate} from './utils/i18n'
-import type {LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
+import type {
+  ClickStrategies,
+  LocalizedNotification,
+  MicroLcNotificationCenter
+} from './micro-lc-notification-center'
 import {HttpClient} from './utils/client'
 import {getLang} from './locale'
+import {getLink} from './utils/link'
+
+function handleClick (
+  clickStrategy: ClickStrategies,
+  pushStateKey: string,
+  content: string | Record<string, any>,
+  allowExternalHrefs = false
+): void {
+  if (clickStrategy === 'push') {
+    const {
+      state
+    } = window.history
+
+    const data = typeof state === 'object' ? {...state} : {}
+    let url: URL | string | undefined
+    if(typeof content === 'string') {
+      url = content
+    } else if (content.url || content.data) {
+      const {url: u, data: d} = content as Record<string, any>
+      d && (data[pushStateKey] = d)
+      u && (url = u as string | URL)
+    }
+
+    window.history.pushState(data, '', url)
+    return
+  }
+
+  if (typeof content === 'string') {
+    const link = getLink(content, allowExternalHrefs)
+    switch (clickStrategy) {
+    case 'replace':
+      window.location.replace(link.href)
+      break
+    case 'href':
+    case 'default':
+    default:
+      link.click()
+      break
+    }
+  }
+}
 
 function localizeNotifications (notifications: LocalizedNotification[]): Notification[] {
   return notifications.map(({title: incomingTitle, content: incomingContent, ...rest}) => {
@@ -39,7 +84,7 @@ function localizeNotifications (notifications: LocalizedNotification[]): Notific
 async function onClick (this: MicroLcNotificationCenter, {readState, ...rest}: Notification, index: number): Promise<void> {
   if (!readState) {
     const newReadState = !readState
-    return await this.httpClient.patchReadState(rest._id, newReadState).then(() => {
+    await this.httpClient.patchReadState(rest._id, newReadState).then(() => {
       this.notifications = [
         ...this.notifications.slice(0, index),
         {...rest, readState: newReadState},
@@ -47,6 +92,12 @@ async function onClick (this: MicroLcNotificationCenter, {readState, ...rest}: N
       ]
       this.unread--
     })
+  }
+
+  const {onClickCallback} = rest
+  const {clickStrategy, pushStateKey, allowExternalHrefs} = this
+  if (onClickCallback && onClickCallback.content) {
+    return handleClick(clickStrategy, pushStateKey, onClickCallback.content, allowExternalHrefs)
   }
 }
 
@@ -83,33 +134,32 @@ export async function loadNotifications (this: MicroLcNotificationCenter, client
 
   const lang = getLang()
 
-  Promise.allSettled([
+  return Promise.allSettled([
     client.getNotifications(skip, lang),
     client.getCounts()
-  ]).then(
-    ([notRes, countsRes]) => {
-      if (notRes.status === 'fulfilled') {
-        const notifications = localizeNotifications(notRes.value)
-        this.error = false
-        this.notifications = reload ? notifications : [...this.notifications, ...notifications]
-        this.page = {skip: skip + this.limit, last: skip}
+  ]).then(([notRes, countsRes]) => {
+    if (notRes.status === 'fulfilled') {
+      const notifications = localizeNotifications(notRes.value)
+      this.error = false
+      this.notifications = reload ? notifications : [...this.notifications, ...notifications]
+      this.page = {skip: skip + this.limit, last: skip}
 
-        if (notifications.length === 0 || notifications.length < this.limit) {
-          this.done = true
-        }
-      } else if (notRes.status === 'rejected') {
-        this.error = true
+      if (notifications.length === 0 || notifications.length < this.limit) {
+        this.done = true
       }
+    } else if (notRes.status === 'rejected') {
+      this.error = true
+    }
 
-      if (countsRes.status === 'fulfilled') {
-        const {count, unread} = countsRes.value
-        this.count = count
-        this.unread = unread
-        if (count !== undefined && this.notifications.length === count) {
-          this.done = true
-        }
+    if (countsRes.status === 'fulfilled') {
+      const {count, unread} = countsRes.value
+      this.count = count
+      this.unread = unread
+      if (count !== undefined && this.notifications.length === count) {
+        this.done = true
       }
-    }).finally(() => {
+    }
+  }).finally(() => {
     this.loading = false
   })
 }
@@ -127,8 +177,7 @@ export function createProps(this: MicroLcNotificationCenter): NotificationCenter
     error: this.error,
     done: this.done,
     onClick: onClick.bind(this),
-    onClickAll: onClickAll.bind(this),
-    clickStrategy: this.clickStrategy
+    onClickAll: onClickAll.bind(this)
   }
 
   if (this.loading !== undefined) {

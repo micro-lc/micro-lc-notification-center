@@ -29,6 +29,7 @@ export default defineConfig({
     charset: 'utf8'
   },
   build: {
+    target: 'ES2015',
     rollupOptions: {
       input: {
         'micro-lc-notification-center': resolve(__dirname, 'src/index.min.ts'),
