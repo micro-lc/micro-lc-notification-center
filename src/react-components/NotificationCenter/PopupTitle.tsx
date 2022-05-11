@@ -8,7 +8,7 @@ import {useEffect} from 'react'
 
 export type PopupTitleProps = {
     loading?: boolean
-    reload?: () => void
+    reload?: () => Promise<void>
     onClickAll?: () => void
     unread?: boolean
     locales: DefaultTranslations

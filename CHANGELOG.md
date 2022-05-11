@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- `/own` requests add a language `lang` query params to help notification translation server-side
+
 ## [v1.0.0-rc2] - 2022/01/17
 
 ### Added

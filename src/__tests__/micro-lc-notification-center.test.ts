@@ -114,25 +114,31 @@ describe('', () => {
     expect(el.create().count).toEqual(0)
     expect(el.create().unread).toEqual(0)
     
-    el.create().reload()
-    await wait(el, () => {
-      expect(fetch).toBeCalledTimes(4)
-    })
+    await el.create().reload()
+
     expect(el.create().notifications).toHaveLength(1)
     expect(el.create().count).toEqual(1)
     expect(el.create().unread).toEqual(1)
   })
   
-  it('should render and then click on first notification', async () => {
+  it('should render and then click on notifications triggering push events', async () => {
     const {history} = window
     Object.defineProperty(window, 'history', {writable: true, value: {state: {}, pushState: jest.fn()}})
     fetch
-      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([{
-        _id: '1', creatorId: '1', createdAt: new Date().toISOString(), title: 'title',
-        content: 'content',
-        onClickCallback: {content: {url: 'https://google.com'}}
-      }])})
-      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 1, unread: 1})})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([
+        {
+          _id: '1', creatorId: '1', createdAt: new Date().toISOString(), title: 'title',
+          content: 'content',
+          onClickCallback: {content: {url: 'https://google.com'}}
+        },
+        {
+          _id: '2', creatorId: '2', createdAt: new Date().toISOString(), title: 'title',
+          content: 'content',
+          onClickCallback: {content: 'https://amazon.com'}
+        }
+      ])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 2, unread: 2})})
+      .mockResolvedValueOnce({ok: true, status: 204})
       .mockResolvedValueOnce({ok: true, status: 204})
 
     const el = await fixture<MicroLcNotificationCenter>(html`
@@ -146,16 +152,19 @@ describe('', () => {
       expect(fetch).toBeCalledTimes(2)
     })
 
-    const not = el.create().notifications[0]
-    el.create().onClick(not, 0)
+    let not = el.create().notifications[0]
+    await el.create().onClick(not, 0)
     
-    await wait(el, () => {
-      expect(fetch).toBeCalledTimes(3)
-    })
-    
-    expect(el.create().count).toEqual(1)
-    expect(el.create().unread).toEqual(0)
+    expect(el.create().count).toEqual(2)
+    expect(el.create().unread).toEqual(1)
     expect(window.history.pushState).toBeCalledWith({}, '', 'https://google.com')
+    
+    not = el.create().notifications[1]
+    await el.create().onClick(not, 1)
+    
+    expect(el.create().count).toEqual(2)
+    expect(el.create().unread).toEqual(0)
+    expect(window.history.pushState).toBeCalledWith({}, '', 'https://amazon.com')
   
     Object.defineProperty(window, 'history', {writable: true, value: history})
   })
@@ -256,5 +265,17 @@ describe('', () => {
 
     expect(el.create().unread).toStrictEqual(0)
     Object.defineProperty(window, 'navigator', {writable: true, value: navigator})
+  })
+})
+
+describe('lifecycle', () => {
+  it('should destroy and re-connect', async () => {
+    const el = await fixture(html`<micro-lc-notification-center></micro-lc-notification-center>`)
+
+    const {parentElement: p} = el
+    el.remove()
+
+    p.appendChild(el)
+    expect(document.body.innerHTML).toContain('<micro-lc-notification-center></micro-lc-notification-center>')
   })
 })

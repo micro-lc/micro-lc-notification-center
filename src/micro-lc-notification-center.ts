@@ -96,10 +96,6 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
    * ```
    */
   @property({attribute: false}) 
-  get locales(): PartialTranslations | DefaultTranslations {
-    return this._locales
-  }
-  
   set locales(pt: PartialTranslations | DefaultTranslations) {
     this._locales = translateLocale<DefaultTranslations>(pt)
   }

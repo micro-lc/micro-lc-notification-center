@@ -4,7 +4,7 @@ import {
   ByRoleMatcher,
   ByRoleOptions,
   fireEvent,
-  render
+  render,
 } from '@testing-library/react'
 
 import {
@@ -63,7 +63,7 @@ const randomNumber = (start = 0, end = 10) => Math.floor(Math.random() * end) + 
 
 const defaultProps: NotificationCenterProps = {
   next: () => {},
-  reload: () => {},
+  reload: async () => {},
   locales: d,
   error: false,
   notifications: [],
@@ -105,6 +105,24 @@ describe('NotificationCenter tests', () => {
     expect(getByText(d.reload)).toBeInTheDocument()
     expect(getByText(d.loadingButton)).toBeInTheDocument()
     expect(getByText(d.readAll)).toBeInTheDocument()
+  })
+  
+  it('should render notifications and then invoke onClick handler on one of them', () => {
+    const onClick = jest.fn()
+    const {getByRole, getByText} = render(
+      <NotificationCenter
+        {...defaultProps}
+        onClick={onClick}
+        notifications={notifications}
+        unread={1}
+      />
+    )
+    clickOnNotificationCenterIcon(getByRole)
+
+    const n = getByText(notifications[0].title)
+    n.click()
+
+    expect(onClick).toBeCalled()
   })
 
   it('should render `loadingButton` when `done` is false', () => {

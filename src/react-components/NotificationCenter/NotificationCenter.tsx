@@ -32,7 +32,7 @@ export type NotificationCenterProps = {
   loading?: boolean;
   notifications: Notification[];
   next?: () => void;
-  reload: () => void;
+  reload: () => Promise<void>;
   locales: DefaultTranslations;
   error: boolean;
   done: boolean;
