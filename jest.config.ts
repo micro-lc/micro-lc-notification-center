@@ -7,11 +7,20 @@ const jestConfig = {
   clearMocks: true,
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
+    '!src/typings.d.ts',
     '!src/index.min.ts',
     '!src/**/index.ts',
     '!src/**/*.less',
     '!**/node_modules/**'
   ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80
+    }
+  },
   coverageReporters: [
     'text',
     'lcov',

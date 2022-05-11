@@ -129,6 +129,7 @@ describe('', () => {
     fetch
       .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([{
         _id: '1', creatorId: '1', createdAt: new Date().toISOString(), title: 'title',
+        content: 'content',
         onClickCallback: {content: {url: 'https://google.com'}}
       }])})
       .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 1, unread: 1})})
@@ -196,6 +197,64 @@ describe('', () => {
       reload: 'a',
       backOnTop: 'a',
     })
+    Object.defineProperty(window, 'navigator', {writable: true, value: navigator})
+  })
+  
+  it('should localize notifications', async () => {
+    const {navigator} = window
+    Object.defineProperty(window, 'navigator', {writable: true, value: {language: 'it'}})
+    fetch
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([{title: {en: 'title', it: 'titolo'}, content: {en: 'content', it: 'contenuto'}}])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 1, unread: 1})})
+
+    const el = await fixture<MicroLcNotificationCenter>(html`<micro-lc-notification-center></micro-lc-notification-center>`)
+    
+    await wait(el, () => {
+      expect(fetch).toBeCalledTimes(2)
+    })
+
+    expect(el.create().notifications[0]).toEqual({title: 'titolo', content: 'contenuto'})
+    Object.defineProperty(window, 'navigator', {writable: true, value: navigator})
+  })
+  
+  it('should be ok on faulty notifications', async () => {
+    const {navigator} = window
+    Object.defineProperty(window, 'navigator', {writable: true, value: {language: 'it'}})
+    fetch
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([{}])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 1, unread: 1})})
+
+    const el = await fixture<MicroLcNotificationCenter>(html`<micro-lc-notification-center></micro-lc-notification-center>`)
+    
+    await wait(el, () => {
+      expect(fetch).toBeCalledTimes(2)
+    })
+
+    expect(el.create().notifications[0]).toEqual({title: ''})
+    Object.defineProperty(window, 'navigator', {writable: true, value: navigator})
+  })
+  
+  it('should patch all notifications', async () => {
+    const {navigator} = window
+    Object.defineProperty(window, 'navigator', {writable: true, value: {language: 'it'}})
+    fetch
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([{}])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 0, unread: 1})})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => 0})
+
+    const el = await fixture<MicroLcNotificationCenter>(html`<micro-lc-notification-center></micro-lc-notification-center>`)
+    
+    await wait(el, () => {
+      expect(fetch).toBeCalledTimes(2)
+    })
+
+    el.create().onClickAll()
+    
+    await wait(el, () => {
+      expect(fetch).toBeCalledTimes(3)
+    })
+
+    expect(el.create().unread).toStrictEqual(0)
     Object.defineProperty(window, 'navigator', {writable: true, value: navigator})
   })
 })
