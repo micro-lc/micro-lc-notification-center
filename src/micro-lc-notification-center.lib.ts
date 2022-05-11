@@ -1,5 +1,5 @@
 import type {Notification, NotificationCenterProps} from './react-components'
-import {translate} from './utils/i18n'
+import {DefaultTranslations, translate} from './utils/i18n'
 import type {
   ClickStrategies,
   LocalizedNotification,
@@ -9,7 +9,19 @@ import {HttpClient} from './utils/client'
 import {getLang} from './locale'
 import {getLink} from './utils/link'
 
+export const defaultTranslations: DefaultTranslations = {
+  title: 'Notifications',
+  loadingButton: 'Load More',
+  dateFormat: 'YYYY-MM-DD',
+  noNotification: 'No notification to show',
+  errorMessage: 'An error occurred, try again',
+  readAll: 'Mark all as read',
+  reload: 'Reload',
+  backOnTop: 'Back on top',
+}
+
 function handleClick (
+  this: MicroLcNotificationCenter,
   clickStrategy: ClickStrategies,
   pushStateKey: string,
   content: string | Record<string, any>,
@@ -35,7 +47,7 @@ function handleClick (
   }
 
   if (typeof content === 'string') {
-    const link = getLink(content, allowExternalHrefs)
+    const link = getLink.call(this, content, allowExternalHrefs)
     switch (clickStrategy) {
     case 'replace':
       window.location.replace(link.href)
@@ -97,7 +109,7 @@ async function onClick (this: MicroLcNotificationCenter, {readState, ...rest}: N
   const {onClickCallback} = rest
   const {clickStrategy, pushStateKey, allowExternalHrefs} = this
   if (onClickCallback && onClickCallback.content) {
-    return handleClick(clickStrategy, pushStateKey, onClickCallback.content, allowExternalHrefs)
+    return handleClick.call(this, clickStrategy, pushStateKey, onClickCallback.content, allowExternalHrefs)
   }
 }
 
@@ -173,7 +185,7 @@ export function createProps(this: MicroLcNotificationCenter): NotificationCenter
     notifications: this.notifications,
     next: this.httpClient && loadNotifications.bind(this, this.httpClient, false),
     reload: this.httpClient && loadNotifications.bind(this, this.httpClient, true),
-    locales: this.locales,
+    locales: this._locales,
     error: this.error,
     done: this.done,
     onClick: onClick.bind(this),

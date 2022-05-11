@@ -5,11 +5,10 @@ const MICRO_LC_NOTIFICATION_CENTER_FONT_FAMILY = '--micro-lc-notification-center
 const MICRO_LC_PRIMARY_COLOR_VAR = '--microlc-primary-color'
 const ANT_VAR_PREFIX = '--ant'
 
-const DEFAULT_FONT_FAMILY = `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 
-  'Helvetica Neue', Arial,
-  'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-  'Noto Color Emoji'
-`
+const DEFAULT_FONT_FAMILY = '-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto,\
+\'Helvetica Neue\', Arial,\
+\'Noto Sans\', sans-serif, \'Apple Color Emoji\', \'Segoe UI Emoji\', \'Segoe UI Symbol\',\
+\'Noto Color Emoji\''
 
 /**
  * return a `:host` css content to be set as root/shadow-root css style

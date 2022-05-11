@@ -8,9 +8,9 @@ import {
   Notification, 
   NotificationCenterProps
 } from './react-components'
-import type {LocalizedString, PartialTranslations} from './utils/i18n'
+import {DefaultTranslations, LocalizedString, PartialTranslations, translateLocale} from './utils/i18n'
 import {DEFAULT_PAGINATION_LIMIT, HttpClient} from './utils/client'
-import {createProps, loadNotifications} from './micro-lc-notification-center.lib'
+import {createProps, defaultTranslations, loadNotifications} from './micro-lc-notification-center.lib'
 import {createClient} from './utils/client'
 import type {FunctionComponent} from 'react'
 import {decorateRoot, shadowRootCSS} from './utils/style'
@@ -95,7 +95,14 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
    * }
    * ```
    */
-  @property({attribute: false}) locales: PartialTranslations = {}
+  @property({attribute: false}) 
+  get locales(): PartialTranslations | DefaultTranslations {
+    return this._locales
+  }
+  
+  set locales(pt: PartialTranslations | DefaultTranslations) {
+    this._locales = translateLocale<DefaultTranslations>(pt)
+  }
 
   /**
    * `clickStrategy` (optional) is an enum taking values
@@ -145,6 +152,7 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
   @state() done = false
   @state() count?: number
   @state() unread?: number
+  @state() _locales = defaultTranslations
 
   @query('#root-div') rootDiv!: HTMLDivElement
   

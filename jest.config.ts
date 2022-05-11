@@ -7,8 +7,9 @@ const jestConfig = {
   clearMocks: true,
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
+    '!src/index.min.ts',
     '!src/**/index.ts',
-    '!src/**/*.*ss',
+    '!src/**/*.less',
     '!**/node_modules/**'
   ],
   coverageReporters: [
@@ -17,7 +18,8 @@ const jestConfig = {
     'cobertura'
   ],
   moduleNameMapper: {
-    '^.+\\.(css|less)$': '<rootDir>/__mocks__/less.js',
+    '@ln\\/(.*)\\.js': '<rootDir>/__mocks__/locale.js',
+    '^.+\\.less$': '<rootDir>/__mocks__/less.js',
     'antd\\/es': ['<rootDir>/node_modules/antd'],
     '@ant-design\\/icons\\/es\\/icons': ['<rootDir>/node_modules/@ant-design/icons']
   },

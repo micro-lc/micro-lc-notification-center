@@ -160,8 +160,7 @@ export function getLang (nav = window.navigator): string {
   return lang
 }
 
-export function loadLocale () {
+export async function loadLocale (): Promise<void> {
   const lang = getLang()
-  
-  import(`@ln/${lang}.js`).then(() => dayjs.locale(lang))
+  await import(`@ln/${lang}.js`).then(() => dayjs.locale(lang))
 }

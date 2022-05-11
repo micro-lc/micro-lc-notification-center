@@ -1,14 +1,13 @@
 import React, {ReactElement, useCallback, useRef} from 'react'
 
-import Typography from 'antd/es/typography'
+import {Typography} from 'antd/es'
 
-import {useLocale} from '../utils/i18n'
 import type {NotificationCenterProps} from './NotificationCenter'
-import NotificationEntry from './NotificationEntry'
+import {NotificationEntry} from './NotificationEntry'
 
 export type NotificationsListProps = Omit<
   NotificationCenterProps,
-  'locales' | 'reload' | 'onClickAll'
+  'reload' | 'onClickAll'
 >
 
 const makeitButton = (ref?: HTMLElement) => {
@@ -16,15 +15,15 @@ const makeitButton = (ref?: HTMLElement) => {
   ref?.setAttribute('tabindex', '0')
 }
 
-export default function NotificationsList({
+export function NotificationsList({
   error,
   done,
   loading,
   onClick,
   next,
-  notifications
+  notifications,
+  locales
 }: NotificationsListProps): ReactElement {
-  const {t} = useLocale()
   const ref = useRef<HTMLDivElement>()
 
   const handleBackOnTop = useCallback(() => {
@@ -40,7 +39,7 @@ export default function NotificationsList({
           onClick={handleBackOnTop}
           style={{marginBottom: '5px'}}
         >
-          {t('backOnTop')}
+          {locales.backOnTop}
         </Typography.Text>
       ) : (
         <Typography.Text
@@ -50,10 +49,10 @@ export default function NotificationsList({
           onClick={next}
           style={{marginBottom: '5px !important'}}
         >
-          {t('loadingButton')}
+          {locales.loadingButton}
         </Typography.Text>
       ),
-    [done, handleBackOnTop, loading, next, t]
+    [done, handleBackOnTop, loading, next]
   )
 
   return (
@@ -64,7 +63,7 @@ export default function NotificationsList({
     >
       {error && (
         <Typography.Text className="display-message" type="danger">
-          {t('errorMessage')}
+          {locales.errorMessage}
         </Typography.Text>
       )}
       {notifications.map((notification, i) => (
@@ -72,10 +71,11 @@ export default function NotificationsList({
           key={i}
           onClick={() => onClick(notification, i)}
           {...notification}
+          locales={locales}
         />
       ))}
       {notifications.length === 0 && (
-        <Typography.Text className="display-message">{t('noNotification')}</Typography.Text>
+        <Typography.Text className="display-message">{locales.noNotification}</Typography.Text>
       )}
       <div
         style={{textAlign: 'center', marginBottom: '5px'}}

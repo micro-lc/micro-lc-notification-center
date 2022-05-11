@@ -1,12 +1,11 @@
-import React, {ReactElement, useCallback, useEffect, useState} from 'react'
+import React, {ReactElement, useEffect, useState} from 'react'
 
 import {BellOutlined} from '@ant-design/icons/es/icons'
-import Popover from 'antd/es/popover'
-import Badge from 'antd/es/badge'
+import {Popover, Badge} from 'antd/es'
 
-import {I18n, DefaultTranslations, PartialTranslations} from '../utils/i18n'
-import NotificationsList from './NotificationList'
-import PopupTitle from './PopupTitle'
+import {DefaultTranslations} from '../../utils/i18n'
+import {NotificationsList} from './NotificationList'
+import {PopupTitle} from './PopupTitle'
 
 type ReadStateHandler = (
   notification: Notification,
@@ -34,7 +33,7 @@ export type NotificationCenterProps = {
   notifications: Notification[];
   next?: () => void;
   reload: () => void;
-  locales: PartialTranslations;
+  locales: DefaultTranslations;
   error: boolean;
   done: boolean;
   onClick: ReadStateHandler;
@@ -43,20 +42,8 @@ export type NotificationCenterProps = {
   unread?: number;
 };
 
-export const defaultTranslations: DefaultTranslations = {
-  title: 'Notifications',
-  loadingButton: 'Load More',
-  dateFormat: 'YYYY-MM-DD',
-  noNotification: 'No notification to show',
-  errorMessage: 'An error occurred, try again',
-  readAll: 'Mark all as read',
-  reload: 'Reload',
-  backOnTop: 'Back on top',
-}
-
 export function NotificationCenter({
   loading,
-  locales,
   reload,
   onClick,
   onClickAll,
@@ -77,53 +64,52 @@ export function NotificationCenter({
   }, [clickOutside])
 
   return (
-    <I18n.Provider value={{defaultTranslations, locales}}>
-      <Popover
-        arrowPointAtCenter
-        className="popover-content-container"
-        content={
-          <NotificationsList
-            loading={loading}
-            onClick={async (notification, index) => {
-              setVisible(false)
-              return onClick(notification, index)
-            }}
-            {...rest}
-          />
-        }
-        getPopupContainer={(node) => node}
-        onVisibleChange={(v) => {
-          setClickOutside(true)
-          !v && setVisible(v)
-        }}
-        placement="bottomRight"
-        title={
-          <PopupTitle
-            loading={loading}
-            onClickAll={onClickAll}
-            reload={reload}
-            unread={unread > 0}
-          />
-        }
-        trigger="click"
-        visible={visible}
+    <Popover
+      arrowPointAtCenter
+      className="popover-content-container"
+      content={
+        <NotificationsList
+          loading={loading}
+          onClick={async (notification, index) => {
+            setVisible(false)
+            return onClick(notification, index)
+          }}
+          {...rest}
+        />
+      }
+      getPopupContainer={(node) => node}
+      onVisibleChange={(v) => {
+        setClickOutside(true)
+        !v && setVisible(v)
+      }}
+      placement="bottomRight"
+      title={
+        <PopupTitle
+          loading={loading}
+          onClickAll={onClickAll}
+          reload={reload}
+          unread={unread > 0}
+          locales={rest.locales}
+        />
+      }
+      trigger="click"
+      visible={visible}
+    >
+      <Badge
+        count={unread}
+        offset={[-5, 5]}
+        size="small"
+        style={{paddingLeft: '3px', paddingRight: '3px'}}
       >
-        <Badge
-          count={unread}
-          offset={[-5, 5]}
-          size="small"
-          style={{paddingLeft: '3px', paddingRight: '3px'}}
+        <button
+          type="button"
+          className="ant-btn ant-btn-circle ant-btn-primary"
+          style={{color: 'white', padding: 'initial'}}
+          onClick={() => {!clickOutside && setVisible(t => !t)}}
         >
-          <button
-            type="button"
-            className="ant-btn ant-btn-circle ant-btn-primary"
-            style={{color: 'white', padding: 'initial'}}
-            onClick={() => {!clickOutside && setVisible(t => !t)}}
-          >
-            <BellOutlined />
-          </button>
-        </Badge>
-      </Popover>
-    </I18n.Provider>
+          <BellOutlined />
+        </button>
+      </Badge>
+    </Popover>
   )
 }

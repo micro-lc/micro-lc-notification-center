@@ -1,27 +1,24 @@
 import React, {ReactElement, Fragment} from 'react'
 
-import Divider from 'antd/es/divider'
-import Badge from 'antd/es/badge'
-import Row from 'antd/es/row'
-import Col from 'antd/es/col'
-import Typography from 'antd/es/typography'
+import {Divider, Badge, Row, Col, Typography} from 'antd/es'
 
-import {useLocale} from '../utils/i18n'
 import type {Notification} from './NotificationCenter'
 import dayjs from 'dayjs'
+import {DefaultTranslations} from '../../utils/i18n'
 
 export type NotificationEntryProps = Notification & {
   onClick: () => void;
+  locales: DefaultTranslations
 };
 
-export default function NotificationEntry({
+export function NotificationEntry({
   title,
   content,
   createdAt,
   readState,
   onClick,
+  locales
 }: NotificationEntryProps): ReactElement {
-  const {t} = useLocale()
 
   return (
     <Fragment>
@@ -47,7 +44,7 @@ export default function NotificationEntry({
             {content}
           </Typography.Paragraph>
           <Typography.Text className="notification-date">
-            {dayjs(createdAt).format(t('dateFormat'))}
+            {dayjs(createdAt).format(locales.dateFormat)}
           </Typography.Text>
         </Col>
         <Col

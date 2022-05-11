@@ -1,7 +1,5 @@
 import '@testing-library/jest-dom'
-import 'construct-style-sheets-polyfill'
-import {elementUpdated} from '@open-wc/testing-helpers'
-import type {LocalizedNotification, MicroLcNotificationCenter} from './micro-lc-notification-center'
+import type {LocalizedNotification} from './micro-lc-notification-center'
 
 Object.defineProperty(global, 'console', {writable: true, value: {...console, error: jest.fn()}})
 
@@ -11,6 +9,7 @@ class EnhancedCSSStyleSheet extends CSSStyleSheet {
     return index ?? 0
   }
 }
+
 Object.defineProperty(global, 'CSSStyleSheet', {writable: true, value: EnhancedCSSStyleSheet})
 
 Object.defineProperty(window, 'matchMedia', {
@@ -83,38 +82,3 @@ export class AllNotifications {
   }
 }
 
-type WaitForOptions = {
-  timeout: number
-}
-
-export async function waitForChanges (
-  page: MicroLcNotificationCenter,
-  callback?: () => any,
-  opts: WaitForOptions = {timeout: 3000}
-): Promise<MicroLcNotificationCenter> {
-  let reason: any
-  let outsideResolve: (value: any) => void
-  let outsideReject: (reason?: any) => void
-  const promise = new Promise<any>((resolve, reject) => {
-    outsideResolve = resolve
-    outsideReject = reject
-  })
-  const interval = setInterval(() => {
-    try {
-      outsideResolve(callback?.())
-    } catch (err) {
-      reason = err
-    }
-  }, 100)
-  const timeout = setTimeout(() => {
-    clearInterval(interval)
-    outsideReject(reason)
-  }, opts.timeout)
-
-  return await promise
-    .then(() => elementUpdated(page))
-    .finally(() => {
-      clearInterval(interval)
-      clearTimeout(timeout)
-    })
-}

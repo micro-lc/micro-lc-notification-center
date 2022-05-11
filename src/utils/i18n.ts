@@ -15,7 +15,7 @@ export type PartialTranslations = Partial<Translations>
 
 const DEFAULT_LANG = 'en'
 
-export function translate (options: Record<string, string>, lang: string = navigator.language || DEFAULT_LANG): string {
+export function translate (options: Record<string, string>, lang: string = window.navigator.language || DEFAULT_LANG): string {
   if (options[lang]) {
     return options[lang]
   }
@@ -25,35 +25,17 @@ export function translate (options: Record<string, string>, lang: string = navig
     return options[lang.substring(0, 2)]
   }
 
-  return options.toString()
+  return ''
 }
 
-// const I18n = createContext<{
-//   defaultTranslations?: DefaultTranslations
-//   locales?: PartialTranslations
-// }>({})
-
-// function useLocale () {
-//   const {defaultTranslations, locales} = useContext(I18n)
-//   const lang = navigator.language || DEFAULT_LANG
-
-//   const t = (key: keyof Translations): string => {
-//     if (locales && locales[key]) {
-//       const translation = locales[key]
-//       if (typeof translation === 'string') {
-//         return translation
-//       }
-
-//       const availableKeys = Object.keys(translation)
-//       if (availableKeys.includes(lang)) {
-//         return translation[lang]
-//       } else if (availableKeys.includes(lang.substring(0, 2))) {
-//         return translation[lang.substring(0, 2)]
-//       }
-//     }
-
-//     return defaultTranslations?.[key]
-//   }
-
-//   return {t, lang}
-// }
+export function translateLocale<T = any>(input: PartialTranslations): T {
+  const lang = window.navigator.language || DEFAULT_LANG
+  return Object.entries(input).reduce((tr, [k, s]) => {
+    if(typeof s === 'string') {
+      tr[k] = s
+    } else {
+      tr[k] = translate(s, lang)
+    }
+    return tr
+  }, {} as Record<string, string>) as unknown as T
+}
