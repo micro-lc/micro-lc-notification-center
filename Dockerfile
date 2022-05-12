@@ -5,14 +5,18 @@ LABEL name="mia-microlc-notification-center" \
       eu.mia-platform.url="https://www.mia-platform.eu" \
       eu.mia-platform.version="0.1.0"
 
-COPY nginx /etc/nginx
+ARG RELEASE_MODE=release
 
 RUN touch ./off \
   && chmod o+rw ./off \
   && echo "micro-lc-notification-center: $COMMIT_SHA" >> /etc/nginx/commit.sha
 
-WORKDIR /usr/static
+COPY nginx /etc/nginx
 
-COPY ./dist/micro-lc-notification-center .
+WORKDIR /etc/nginx/conf.d
+RUN mv website.${RELEASE_MODE}.conf website.conf
+
+WORKDIR /usr/static
+COPY ./dist/unpkg .
 
 USER nginx

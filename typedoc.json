@@ -1,7 +1,0 @@
-{
-  "entryPoints": ["src/index.ts"],
-  "out": "docs",
-  "tsconfig": "plugins/typedoc/tsconfig.json",
-  "cleanOutputDir": false,
-  "plugin": ["typedoc-plugin-missing-exports"]
-}

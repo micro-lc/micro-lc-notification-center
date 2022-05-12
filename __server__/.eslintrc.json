@@ -1,0 +1,12 @@
+{
+  "extends": "../.eslintrc.json",
+  "parserOptions": {
+    "sourceType": "script"
+  },
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "@typescript-eslint/no-var-requires": 0
+  }
+}
