@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- `/own` requests add a language `lang` query params to help notification translation server-side
+## [v2.0.0] - 2022/05/12
+
+### Added
+
+- `micro-lc-notification-center` webcomponent migrated to [lit](https://lit.dev/) and build is using [vite](https://vitejs.dev/)
+
+### Changed
+
+- `/own` requests add a language `lang` query params to help notification translation server-side (possibly breaking server-side)
 
 ## [v1.0.0-rc2] - 2022/01/17
 
