@@ -10,7 +10,7 @@ import {
 } from './react-components'
 import {DefaultTranslations, LocalizedString, PartialTranslations, translateLocale} from './utils/i18n'
 import {DEFAULT_PAGINATION_LIMIT, HttpClient} from './utils/client'
-import {createProps, defaultTranslations, loadNotifications} from './micro-lc-notification-center.lib'
+import {autoFetchData, createProps, defaultTranslations, loadNotifications} from './micro-lc-notification-center.lib'
 import {createClient} from './utils/client'
 import type {FunctionComponent} from 'react'
 import {decorateRoot, shadowRootCSS} from './utils/style'
@@ -138,8 +138,21 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
    */
   @property({type: Boolean, attribute: 'allow-external-hrefs'}) allowExternalHrefs = false
 
-  // TODO
+  // TODO: 'long-polling', 'websocket'
+  /**
+   * `mode (optional)
+   * defaults to 'default'. Strategy to implement for automatically
+   * fetching notifications.
+   */
   @property() mode: ResourceFetchingMode = 'default'
+
+  /**
+   * `polling-timer
+   * defaults to 10000. Milliseconds between each polling requests.
+   * Ignored if `mode` is not 'polling'.
+   */
+  @property({type: Number, attribute: 'polling-frequency'}) pollingFrequency = 10_000
+
 
   @state() notifications: Notification[] = []
   @state() loading?: boolean
@@ -167,6 +180,11 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
   Component: FunctionComponent<NotificationCenterProps> = NotificationCenter
 
   /**
+   * Polling calls timer
+   */
+  pollingTimer?: NodeJS.Timer
+
+  /**
    * webcomponents lifecycle
    */
   connectedCallback(): void {
@@ -192,7 +210,7 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
     loadNotifications.call(this, httpClient, false)
 
     if(!['default', 'none'].includes(this.mode)) {
-      // TODO
+      autoFetchData.call(this, httpClient)
     }
     this.httpClient = httpClient
   }
@@ -208,6 +226,7 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
   
   disconnectedCallback(): void {
     unmount.call(this)
+    clearInterval(this.pollingTimer)
     this._shouldRenderWhenConnected = true
     this.subscription.unsubscribe()
     super.disconnectedCallback()

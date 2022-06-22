@@ -5,7 +5,7 @@ import type {
   LocalizedNotification,
   MicroLcNotificationCenter
 } from './micro-lc-notification-center'
-import {HttpClient} from './utils/client'
+import type {HttpClient} from './utils/client'
 import {getLang} from './locale'
 import {getLink} from './utils/link'
 
@@ -136,18 +136,24 @@ async function onClickAll (this: MicroLcNotificationCenter): Promise<number | vo
  * The `reload` flag prevents advancing though unless is
  * explicitly set to `true`
  * @param this the `micro-lc-notification-center` webcomponent instance
- * @param reload a boolean flag to trigger reload (default to true)
+ * @param client the client performing HTTP calls
+ * @param reload a boolean flag to trigger reload (default to false)
  * @returns
  */
-export async function loadNotifications (this: MicroLcNotificationCenter, client: HttpClient, reload = false): Promise<void> {
+export async function loadNotifications (this: MicroLcNotificationCenter, client: HttpClient, reload: boolean | 'keep-limit' = false): Promise<void> {
   const skip = reload ? 0 : this.page.skip
   this.loading = true
   this.done = false
 
   const lang = getLang()
+  let limit = this.limit
+  if (reload === 'keep-limit' && this.notifications.length > 0) {
+    const extra = (this.notifications.length % this.limit === 0) ? 0 : 1
+    limit = (Math.floor(this.notifications.length / this.limit) + extra) * this.limit
+  }
 
   return Promise.allSettled([
-    client.getNotifications(skip, lang),
+    client.getNotifications(skip, lang, limit),
     client.getCounts()
   ]).then(([notRes, countsRes]) => {
     if (notRes.status === 'fulfilled') {
@@ -174,6 +180,20 @@ export async function loadNotifications (this: MicroLcNotificationCenter, client
   }).finally(() => {
     this.loading = false
   })
+}
+
+/**
+ * Sets up automatic fetching of notifications accordingly to 'mode' property.
+ * @param this the `micro-lc-notification-center` webcomponent instance
+ * @param client the client performing HTTP calls
+ * @returns
+ */
+export function autoFetchData (this: MicroLcNotificationCenter, client: HttpClient) {
+  const {mode, pollingFrequency} = this
+  
+  if (mode === 'polling') {
+    this.pollingTimer = setInterval(() => loadNotifications.call(this, client, 'keep-limit') , pollingFrequency)
+  }
 }
 
 /**

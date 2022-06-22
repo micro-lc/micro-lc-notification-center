@@ -17,7 +17,7 @@ export enum Routes {
 }
 
 export type HttpClient = {
-  getNotifications(skip: number, lang?: string): Promise<Notification[]>
+  getNotifications(skip: number, lang?: string, limit?: number): Promise<Notification[]>
   getCounts(): Promise<Counters>
   patchReadState(_id: string, readState?: boolean): Promise<void>
   patchAllReadState(): Promise<number | void>
@@ -71,15 +71,15 @@ function resolveEndpoint(this: MicroLcNotificationCenter, subpath: string, searc
 
 export function createClient (this: MicroLcNotificationCenter) {
   return {
-    getNotifications: async (skip: number, lang?: string): Promise<Notification[]> => {
+    getNotifications: async (skip: number, lang?: string, limit?: number): Promise<Notification[]> => {
       const {
         headers,
-        limit,
+        limit: defaultLimit,
         skipQueryParam,
         limitQueryParam
       } = this
 
-      const url = resolveEndpoint.call(this, `${Routes.Fetch}`, {[skipQueryParam]: `${skip}`, [limitQueryParam]: `${limit}`, lang})
+      const url = resolveEndpoint.call(this, `${Routes.Fetch}`, {[skipQueryParam]: `${skip}`, [limitQueryParam]: `${limit ?? defaultLimit}`, lang})
       return await fetch(url, {method: 'GET', headers: {...headers}})
         .then((res) => responseHandler(res) as Promise<Notification[]>)
     },
