@@ -17,8 +17,8 @@ describe('', () => {
       endpoint: '/',
       headers: {},
       limit: 10,
-      skipQueryParams: 'skip',
-      limitQueryParams: 'limit'
+      skipQueryParam: 'skip',
+      limitQueryParam: 'limit'
     }
     
     fetch.mockResolvedValueOnce({ok: true, status: 200, json: async () => ([])})
@@ -28,14 +28,31 @@ describe('', () => {
     expect(fetch).toBeCalledWith(expect.stringMatching(/\/own\?.*$/), {method: 'GET', headers: {}})
     expect(n).toEqual([])
   })
+
+  it('should override limit', async () => {
+    const center = {
+      endpoint: '/',
+      headers: {},
+      limit: 10,
+      skipQueryParam: 'skip',
+      limitQueryParam: 'limit'
+    }
+    
+    fetch.mockResolvedValueOnce({ok: true, status: 200, json: async () => ([])})
+    const {getNotifications} = createClient.call(center as unknown as MicroLcNotificationCenter)
+
+    const n = await getNotifications(0, 'en', 15)
+    expect(fetch).toBeCalledWith(expect.stringMatching(/\/own\?.*limit=15.*$/), {method: 'GET', headers: {}})
+    expect(n).toEqual([])
+  })
   
   it('should ensure endpoint starts with a slash', async () => {
     const center = {
       endpoint: '',
       headers: {},
       limit: 10,
-      skipQueryParams: 'skip',
-      limitQueryParams: 'limit'
+      skipQueryParam: 'skip',
+      limitQueryParam: 'limit'
     }
     
     fetch.mockResolvedValueOnce({ok: true, status: 200, json: async () => ([])})
