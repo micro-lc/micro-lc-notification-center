@@ -266,6 +266,72 @@ describe('', () => {
     expect(el.create().unread).toStrictEqual(0)
     Object.defineProperty(window, 'navigator', {writable: true, value: navigator})
   })
+
+  it('should perform polling', async () => {
+    const {navigator} = window
+    Object.defineProperty(window, 'navigator', {writable: true, value: {language: 'it'}})
+    fetch
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 0, unread: 0})})
+
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([{_id: 'id_1'}, {_id: 'id_2'}])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 2, unread: 0})})
+
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([
+        {_id: 'id_1'}, {_id: 'id_2'}, {_id: 'id_3'}, {_id: 'id_4'}, {_id: 'id_5'}, {_id: 'id_6'}
+      ])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 6, unread: 1})})
+
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ([{_id: 'id_1'}, {_id: 'id_2'}, {_id: 'id_3'}])})
+      .mockResolvedValueOnce({ok: true, status: 200, json: async () => ({count: 3, unread: 0})})
+    
+    const el = await fixture<MicroLcNotificationCenter>(html`
+      <micro-lc-notification-center
+        .mode=${'polling'}
+        .pollingFrequency=${500}
+        .limit=${5}
+      ></micro-lc-notification-center>`
+    )
+
+    // firstUpdated
+    await wait(el, () => {
+      expect(el.pollingTimer).toBeTruthy()
+      expect(fetch).toBeCalledTimes(2)
+      expect(el.create().notifications).toHaveLength(0)
+      expect(el.create().unread).toEqual(0)
+    })
+    
+    // first polling
+    await wait(el, () => {
+      expect(fetch).toBeCalledTimes(4)
+      expect(el.create().notifications).toHaveLength(2)
+      expect(el.create().unread).toEqual(0)
+    }, {timeout: 950}) // 50 ms before next polling call
+
+    // second polling
+    await wait(el, () => {
+      expect(fetch).toBeCalledTimes(6)
+      expect(el.create().notifications).toHaveLength(6)
+      expect(el.create().count).toEqual(6)
+      expect(el.create().unread).toEqual(1)
+    }, {timeout: 950})
+
+    // third polling
+    await wait(el, () => {
+      expect(fetch).toBeCalledTimes(8)
+      expect(fetch).nthCalledWith(
+        7, 
+        expect.stringMatching(/own.*limit=10.*$/), // 6 notifications, limit=5 --> polling requests with limit 10
+        expect.anything()
+      )
+      expect(el.limit).toEqual(5)
+
+      expect(el.create().notifications).toHaveLength(3)
+      expect(el.create().unread).toEqual(0)
+    }, {timeout: 950})
+
+    Object.defineProperty(window, 'navigator', {writable: true, value: navigator})
+  })
 })
 
 describe('lifecycle', () => {
