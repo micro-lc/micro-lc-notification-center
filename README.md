@@ -35,7 +35,9 @@ comes with few customizable props
 |`skipQueryParam`|`skip-query-param`|string|'skip'|string to use as query param as pagination skip param|
 |`pushStateKey`|`push-state-key`|string|'micro-lc-notification-center'|it's the key used to scope the content callback context in window.history.state when clickStrategy is 'push'. Otherwise it is neglected|
 |`allowExternalHrefs`|`allow-external-hrefs`|string|'micro-lc-notification-center'|When true and clickStrategy is `default`, `href` or `replace`, notification links can browse to external web pages and href are not checked to ensure they are relative to self-website|
-|`mode`|`mode`|string|'default'|TODO|
+|`mode`|`mode`|[ResourceFetchingMode](#resource-fetching-mode)|'default'|Strategy to implement for automatic notifications fetching|
+|`pollingFrequency`|`pollingFrequency`|number|10000|frequency of notifications automatic fetching (in milliseconds), if mode is set to `polling`|
+
 
 ## partial translations
 
@@ -81,6 +83,18 @@ enum ClickStrategies =
 An on-click-strategy correspond to what happens when a notification is clicked.
 `default` and `href` do create an invisible `anchor` and click it, `replace`
 triggers `window.location.replace` while `push` pushes onto `window.history` stack.
+
+## resource fetching mode
+
+```typescript
+enum ClickStrategies =
+  'polling' |
+  'default' |
+  'none'
+```
+
+Determines how the data is automatically fetched. If `polling`, the property `pollingFrequency` determines the fetching frequency. If `default` or `none`, data is never fetched automatically.
+
 
 # backend communication
 
