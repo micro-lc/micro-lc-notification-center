@@ -33,8 +33,11 @@ const setCssVariables = (primary: string) => {
 }
 
 export function shadowRootCSS(doc?: Document): string {
-  const microlcPrimaryColor = window.getComputedStyle((doc ?? document).documentElement).getPropertyValue(MICRO_LC_PRIMARY_COLOR_VAR)
-  return setCssVariables(microlcPrimaryColor)
+  const microlcPrimaryColor = window.getComputedStyle((doc ?? document).documentElement).getPropertyValue(MICRO_LC_PRIMARY_COLOR_VAR) as string | undefined
+
+  return microlcPrimaryColor === undefined || microlcPrimaryColor.trim() === '' ?
+    ':host{}' :
+    setCssVariables(microlcPrimaryColor)
 }
 
 export function decorateRoot<T extends LitElement>(this: T, styleSheets: string | string[]): void {

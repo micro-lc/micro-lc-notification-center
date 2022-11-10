@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [v2.1.1] - 2022/11/10
+
+### Fixed
+
+- `micro-lc-notification-center` do not force CSS variable computing if `--microlc-primary-color` is `undefined` or empty string
+
 ## [v2.1.0] - 2022/06/23
 
 ### Added
