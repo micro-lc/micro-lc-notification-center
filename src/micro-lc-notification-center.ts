@@ -25,6 +25,7 @@ type Pagination = {
 
 export type MicroLcHeaders = Record<string, string>
 export type ClickStrategies = 'default' | 'href' | 'replace' | 'push'
+export type LinkTargets = '_self' | '_blank' | '_top' | '_parent'
 export type CallbackHref = {
   content: string | Record<string, any>
 }
@@ -138,6 +139,14 @@ export class MicroLcNotificationCenter extends LitElement implements LitCreatabl
    */
   @property({type: Boolean, attribute: 'allow-external-hrefs'}) allowExternalHrefs = false
 
+  /**
+   * `linkTarget` (optional) is the target attribute of the HTMLAnchorElement
+   * '_self' | '_blank' | '_top' | '_parent' which correspond to
+   * where to open the link (if any) of the notification.
+   * ref: https://www.w3schools.com/tags/att_a_target.asp
+   */
+  @property({attribute: 'target'}) linkTarget: LinkTargets = '_self'
+  
   // TODO: 'long-polling', 'websocket'
   /**
    * `mode (optional)
