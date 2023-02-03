@@ -9,7 +9,8 @@ describe('', () => {
       ownerDocument: {
         createElement: jest.fn().mockReturnValue({
           protocol: 'http:',
-          host: 'localhost'
+          host: 'localhost',
+          target: '_self',
         })
       }
     }
@@ -19,6 +20,7 @@ describe('', () => {
       host: 'localhost',
       href: '/content',
       protocol: 'http:',
+      target: '_self',
     })
   })
   
@@ -37,6 +39,7 @@ describe('', () => {
       host: 'localhost',
       href: '/content',
       protocol: 'http:',
+      target: '_self',
     })
   })
   
@@ -45,7 +48,8 @@ describe('', () => {
       ownerDocument: {
         createElement: jest.fn().mockReturnValue({
           protocol: 'https:',
-          host: 'google.com'
+          host: 'google.com',
+          target: '_self',
         })
       }
     }
@@ -55,6 +59,7 @@ describe('', () => {
       host: 'google.com',
       href: 'https://google.com/content',
       protocol: 'https:',
+      target: '_self',
     })
   })
 })

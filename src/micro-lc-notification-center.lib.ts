@@ -25,7 +25,8 @@ function handleClick (
   clickStrategy: ClickStrategies,
   pushStateKey: string,
   content: string | Record<string, any>,
-  allowExternalHrefs = false
+  allowExternalHrefs = false,
+  linkTarget = '_self'
 ): void {
   if (clickStrategy === 'push') {
     const {
@@ -47,7 +48,7 @@ function handleClick (
   }
 
   if (typeof content === 'string') {
-    const link = getLink.call(this, content, allowExternalHrefs)
+    const link = getLink.call(this, content, allowExternalHrefs, linkTarget)
     switch (clickStrategy) {
     case 'replace':
       window.location.replace(link.href)
@@ -107,9 +108,9 @@ async function onClick (this: MicroLcNotificationCenter, {readState, ...rest}: N
   }
 
   const {onClickCallback} = rest
-  const {clickStrategy, pushStateKey, allowExternalHrefs} = this
+  const {clickStrategy, pushStateKey, allowExternalHrefs, linkTarget} = this
   if (onClickCallback && onClickCallback.content) {
-    return handleClick.call(this, clickStrategy, pushStateKey, onClickCallback.content, allowExternalHrefs)
+    return handleClick.call(this, clickStrategy, pushStateKey, onClickCallback.content, allowExternalHrefs, linkTarget)
   }
 }
 
